@@ -155,7 +155,7 @@ export default function Home() {
         if (error) throw error;
       } else {
         // Create auth user
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { error: authError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
         });
@@ -163,7 +163,7 @@ export default function Home() {
         if (authError) throw authError;
 
         // Insert into public.users table
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('users')
           .insert([{
             company_name: formData.company,

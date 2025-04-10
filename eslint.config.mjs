@@ -6,11 +6,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
+  // import.meta.dirname is available after Node.js v20.11.0
   baseDirectory: __dirname,
-});
+  recommendedConfig: js.configs.recommended,
+})
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-];
+  ...compat.config({
+    extends: ['next', 'prettier'],
+  }),
+]
 
 export default eslintConfig;
