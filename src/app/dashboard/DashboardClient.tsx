@@ -7,7 +7,10 @@ import {
     HomeModernIcon as HomeIcon,
     DocumentPlusIcon as DocumentAddIcon,
     MagnifyingGlassIcon as SearchIcon,
-    ArrowLeftOnRectangleIcon as LogoutIcon
+    ArrowLeftOnRectangleIcon as LogoutIcon,
+    ChatBubbleBottomCenterTextIcon as ContactIcon,
+    ClipboardDocumentListIcon as RequestIcon,
+    UserGroupIcon as UsersIcon
 } from '@heroicons/react/24/outline'
 import SeoProvider from "@/components/seo-provider";
 
@@ -44,12 +47,68 @@ export default function DashboardClient() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('dashboard');
 
+    const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
+    const [searchRequests, setSearchRequests] = useState<any[]>([]);
+    const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+    const [isLoadingRequests, setIsLoadingRequests] = useState(false);
+
+    const [users, setUsers] = useState<any[]>([]);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+    // All users fetching
+    useEffect(() => {
+        const fetchUsers = async () => {
+            if (activeTab !== 'all-users') return;
+
+            setIsLoadingUsers(true);
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const formattedData = data.map(user => ({
+                    ...user,
+                    created_at: convertToIST(user.created_at),
+                    updated_at: convertToIST(user.updated_at)
+                }));
+
+                setUsers(formattedData);
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                setUsers([]);
+            } finally {
+                setIsLoadingUsers(false);
+            }
+        };
+
+        fetchUsers();
+    }, [activeTab]);
+
+    // Helper conversion in IST
+    const convertToIST = (utcDate: string) => {
+        const date = new Date(utcDate);
+        return date.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            dateStyle: 'short',
+            timeStyle: 'short'
+        });
+    };
+
     const navigation = [
         {
             name: 'Dashboard',
             id: 'dashboard',
             icon: HomeIcon,
             current: activeTab === 'dashboard'
+        },
+        {
+            name: 'All Users',
+            id: 'all-users',
+            icon: UsersIcon,
+            current: activeTab === 'all-users'
         },
         {
             name: 'Add Vendor',
@@ -63,7 +122,81 @@ export default function DashboardClient() {
             icon: SearchIcon,
             current: activeTab === 'vendor-search'
         },
+        {
+            name: 'Contact Submissions',
+            id: 'contact-submissions',
+            icon: ContactIcon,
+            current: activeTab === 'contact-submissions'
+        },
+        {
+            name: 'Requests',
+            id: 'requests',
+            icon: RequestIcon,
+            current: activeTab === 'requests'
+        },
     ];
+
+    useEffect(() => {
+        const fetchContacts = async () => {
+            if (activeTab !== 'contact-submissions') return;
+
+            setIsLoadingContacts(true);
+            try {
+                const { data, error } = await supabase
+                    .from('contact_submissions')
+                    .select('*')
+                    .order('submitted_at', { ascending: false });
+
+                if (error) throw error;
+
+                const formattedData = data.map(item => ({
+                    ...item,
+                    submitted_at: convertToIST(item.submitted_at)
+                }));
+
+                setContactSubmissions(formattedData);
+            } catch (error) {
+                console.error('Error fetching contacts:', error);
+                setContactSubmissions([]);
+            } finally {
+                setIsLoadingContacts(false);
+            }
+        };
+
+        fetchContacts();
+    }, [activeTab]);
+
+    // Search Requests
+    useEffect(() => {
+        const fetchRequests = async () => {
+            if (activeTab !== 'requests') return;
+
+            setIsLoadingRequests(true);
+            try {
+                const { data, error } = await supabase
+                    .from('search_requests')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const formattedData = data.map(item => ({
+                    ...item,
+                    requested_at: convertToIST(item.requested_at),
+                    created_at: convertToIST(item.created_at)
+                }));
+
+                setSearchRequests(formattedData);
+            } catch (error) {
+                console.error('Error fetching requests:', error);
+                setSearchRequests([]);
+            } finally {
+                setIsLoadingRequests(false);
+            }
+        };
+
+        fetchRequests();
+    }, [activeTab]);
 
     // Add this useEffect for fetching vendors
     useEffect(() => {
@@ -102,7 +235,7 @@ export default function DashboardClient() {
         return () => clearTimeout(debounceTimer);
     }, [searchQuery, currentPage]);
 
-    // Add delete handler
+    // Add delete vendor handler
     const handleDelete = async (srNo: string) => {
         if (!window.confirm('Are you sure you want to delete this vendor?')) return;
 
@@ -119,6 +252,60 @@ export default function DashboardClient() {
         } catch (error) {
             console.error('Delete error:', error);
             setMessage('Error deleting vendor');
+        }
+    };
+
+    // Add delete contac submm handler
+    const handleDeleteContact = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this contact submission?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('contact_submissions')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setContactSubmissions(prev => prev.filter(sub => sub.id !== id));
+        } catch (error) {
+            console.error('Delete error:', error);
+        }
+    };
+
+    // Add delete request handler
+    const handleDeleteRequest = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this request?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('search_requests')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setSearchRequests(prev => prev.filter(req => req.id !== id));
+        } catch (error) {
+            console.error('Delete error:', error);
+        }
+    };
+
+    // Add delete user handler
+    const handleDeleteUser = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this user?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('users')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setUsers(prev => prev.filter(user => user.id !== id));
+        } catch (error) {
+            console.error('Delete error:', error);
         }
     };
 
@@ -595,6 +782,148 @@ export default function DashboardClient() {
                                                 </div>
                                             </div>
                                         </>
+                                    )}
+                                </div>
+                            </section>
+
+                            {/* Contact Submissions Section */}
+                            <section id="contact-submissions" className={`${activeTab === 'contact-submissions' ? 'block' : 'hidden'}`}>
+                                <div className="bg-white p-6 rounded-lg shadow-md">
+                                    <h2 className="text-2xl font-semibold mb-6">Contact Submissions</h2>
+
+                                    {isLoadingContacts ? (
+                                        <div className="text-center py-4">Loading submissions...</div>
+                                    ) : contactSubmissions.length === 0 ? (
+                                        <div className="text-center py-4 text-gray-500">No submissions found</div>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Message</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Submitted At (IST)</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {contactSubmissions.map((submission, index) => (
+                                                        <tr key={index}>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{submission.name}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{submission.email}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm max-w-xs truncate">{submission.message}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{submission.submitted_at}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                                <button
+                                                                    onClick={() => handleDeleteContact(submission.id)}
+                                                                    className="text-red-600 hover:text-red-900"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            {/* Requests Section */}
+                            <section id="requests" className={`${activeTab === 'requests' ? 'block' : 'hidden'}`}>
+                                <div className="bg-white p-6 rounded-lg shadow-md">
+                                    <h2 className="text-2xl font-semibold mb-6">Search Requests</h2>
+
+                                    {isLoadingRequests ? (
+                                        <div className="text-center py-4">Loading requests...</div>
+                                    ) : searchRequests.length === 0 ? (
+                                        <div className="text-center py-4 text-gray-500">No requests found</div>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Chemical Name</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">CAS Number</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Contact Info</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Searched Query</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Requested At (IST)</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Created At (IST)</th>
+                                                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {searchRequests.map((request, index) => (
+                                                        <tr key={index}>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{request.chemical_name}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{request.cas_number}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{request.contact_info}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{request.searched_query}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{request.requested_at}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{request.created_at}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                                <button
+                                                                    onClick={() => handleDeleteRequest(request.id)}
+                                                                    className="text-red-600 hover:text-red-900"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            {/* All Users Section */}
+                            <section id="all-users" className={`${activeTab === 'all-users' ? 'block' : 'hidden'}`}>
+                                <div className="bg-white p-6 rounded-lg shadow-md">
+                                    <h2 className="text-2xl font-semibold mb-6">All Users</h2>
+
+                                    {isLoadingUsers ? (
+                                        <div className="text-center py-4">Loading users...</div>
+                                    ) : users.length === 0 ? (
+                                        <div className="text-center py-4 text-gray-500">No users found</div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {users.map((user, index) => (
+                                                <div key={index} className="border rounded-lg p-4 shadow-sm">
+                                                    <div className="space-y-2">
+                                                        <div>
+                                                            <h3 className="font-semibold text-lg">{user.company_name}</h3>
+                                                            <p className="text-sm text-gray-600">{user.full_name}</p>
+                                                        </div>
+                                                        <div className="text-sm">
+                                                            <p className="break-all">
+                                                                <span className="font-medium">Email:</span> {user.email}
+                                                            </p>
+                                                            <p>
+                                                                <span className="font-medium">Mobile:</span> {user.mobile}
+                                                            </p>
+                                                        </div>
+                                                        <div className="text-sm text-gray-500">
+                                                            <p>
+                                                                <span className="font-medium">Created:</span> {user.created_at}
+                                                            </p>
+                                                            <p>
+                                                                <span className="font-medium">Updated:</span> {user.updated_at}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDeleteUser(user.id)}
+                                                        className="text-red-600 hover:text-red-900"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                             </section>
