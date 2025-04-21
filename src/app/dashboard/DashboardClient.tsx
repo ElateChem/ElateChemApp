@@ -13,6 +13,7 @@ import {
     UserGroupIcon as UsersIcon
 } from '@heroicons/react/24/outline'
 import SeoProvider from "@/components/seo-provider";
+import Papa from 'papaparse';
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,6 +55,112 @@ export default function DashboardClient() {
 
     const [users, setUsers] = useState<any[]>([]);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+    const [csvFile, setCsvFile] = useState<File | null>(null);
+    const [isProcessingCSV, setIsProcessingCSV] = useState(false);
+    const [processingProgress, setProcessingProgress] = useState('');
+    const [csvError, setCsvError] = useState('');
+    // Add new state variables
+    const [processingRows, setProcessingRows] = useState<Array<{
+        data: any;
+        status: 'pending' | 'processing' | 'completed' | 'error';
+        srno?: string;
+        error?: string;
+    }>>([]);
+
+
+    // Add CSV upload handler
+    const handleCSVUpload = async () => {
+        if (!csvFile) return;
+
+        setIsProcessingCSV(true);
+        setCsvError('');
+        setProcessingProgress('Starting CSV processing...');
+        setProcessingRows([]);
+
+        try {
+            // Get all existing Srno values
+            const { data: existingSrno, error: srnoError } = await supabase
+                .from('vendors_list')
+                .select('Srno');
+
+            if (srnoError) throw new Error('Error fetching existing Srno values');
+
+            // Find the maximum numeric Srno
+            let currentSrno = existingSrno.reduce((max, item) => {
+                const num = parseInt(item.Srno);
+                return !isNaN(num) && num > max ? num : max;
+            }, 0);
+
+            // Parse CSV file
+            Papa.parse(csvFile, {
+                header: true,
+                complete: async (results) => {
+                    const rows = results.data as any[];
+                    setProcessingRows(rows.map(row => ({
+                        data: row,
+                        status: 'pending'
+                    })));
+
+                    // Process rows sequentially
+                    for (let i = 0; i < rows.length; i++) {
+                        currentSrno++;
+                        const newSrno = currentSrno.toString();
+
+                        setProcessingRows(prev => prev.map((item, index) =>
+                            index === i ? {
+                                ...item,
+                                status: 'processing',
+                                srno: newSrno
+                            } : item
+                        ));
+
+                        const rowData = rows[i];
+                        const { error } = await supabase
+                            .from('vendors_list')
+                            .insert([{
+                                Srno: newSrno,
+                                Chemicalname: rowData.Chemicalname,
+                                Category: rowData.Category,
+                                Casno: rowData.Casno,
+                                Suppliername: rowData.Suppliername,
+                                "Email&link": rowData["Email&link"],
+                                Phoneno: rowData.Phoneno,
+                                Businessstatus: rowData.Businessstatus,
+                                Country: rowData.Country
+                            }]);
+
+                        setProcessingRows(prev => prev.map((item, index) =>
+                            index === i ? {
+                                ...item,
+                                status: error ? 'error' : 'completed',
+                                error: error?.message
+                            } : item
+                        ));
+
+                        if (error) {
+                            setCsvError(`Error at row ${i + 1}: ${error.message}`);
+                            break;
+                        }
+                    }
+
+                    // Update form's Srno after successful upload
+                    const newMaxSrno = currentSrno + 1;
+                    setSrNo(newMaxSrno.toString());
+                    setMessage(`${rows.length} vendors added successfully`);
+                    setCsvFile(null);
+                },
+                error: (error) => {
+                    throw new Error(`CSV parsing error: ${error.message}`);
+                }
+            });
+        } catch (error) {
+            console.error('CSV processing error:', error);
+            setCsvError(error instanceof Error ? error.message : 'Failed to process CSV');
+        } finally {
+            setIsProcessingCSV(false);
+        }
+    };
 
     // All users fetching
     useEffect(() => {
@@ -509,6 +616,98 @@ export default function DashboardClient() {
                                 <div className="bg-white p-6 rounded-lg shadow-md mb-8">
                                     <h2 className="text-2xl font-semibold mb-6">Add New Vendor</h2>
 
+                                    {/* CSV Upload Section */}
+                                    <div className="mb-8 border rounded-lg p-4 bg-gray-50">
+                                        <h3 className="text-lg font-medium mb-4">Bulk Upload via CSV</h3>
+
+                                        <div className="flex items-center gap-4">
+                                            <input
+                                                type="file"
+                                                accept=".csv"
+                                                onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                                                className="block w-full text-sm text-gray-500
+                                                file:mr-4 file:py-2 file:px-4
+                                                file:rounded-full file:border-0
+                                                file:text-sm file:font-semibold
+                                                file:bg-blue-50 file:text-blue-700
+                                                hover:file:bg-blue-100
+                                                disabled:opacity-50"
+                                                disabled={isProcessingCSV}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handleCSVUpload}
+                                                disabled={!csvFile || isProcessingCSV}
+                                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 
+            disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                            >
+                                                {isProcessingCSV ? 'Uploading...' : 'Upload CSV'}
+                                            </button>
+                                        </div>
+                                        {processingProgress && (
+                                            <div className="mt-4 text-sm text-blue-600">
+                                                <div className="flex items-center gap-2">
+                                                    {isProcessingCSV && (
+                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                                    )}
+                                                    {processingProgress}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {csvError && (
+                                            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                                                {csvError}
+                                            </div>
+                                        )}
+
+                                        <div className="mt-6">
+                                            <h4 className="text-sm font-medium mb-2">Processing Status:</h4>
+                                            <div className="max-h-96 overflow-y-auto">
+                                                <table className="w-full text-sm">
+                                                    <thead>
+                                                        <tr className="bg-gray-50">
+                                                            <th className="px-4 py-2 text-left">Status</th>
+                                                            <th className="px-4 py-2 text-left">Sr.No</th>
+                                                            <th className="px-4 py-2 text-left">Chemical Name</th>
+                                                            <th className="px-4 py-2 text-left">Supplier</th>
+                                                            <th className="px-4 py-2 text-left">Details</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {processingRows.map((row, index) => (
+                                                            <tr key={index} className="border-b">
+                                                                <td className="px-4 py-2">
+                                                                    <div className="flex items-center gap-2">
+                                                                        {row.status === 'processing' && (
+                                                                            <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+                                                                        )}
+                                                                        <span className={`text-sm ${row.status === 'completed' ? 'text-green-600' :
+                                                                                row.status === 'error' ? 'text-red-600' :
+                                                                                    'text-gray-600'
+                                                                            }`}>
+                                                                            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-4 py-2 font-mono">{row.srno || '--'}</td>
+                                                                <td className="px-4 py-2">{row.data.Chemicalname}</td>
+                                                                <td className="px-4 py-2">{row.data.Suppliername}</td>
+                                                                <td className="px-4 py-2">
+                                                                    {row.error && (
+                                                                        <span className="text-red-500 text-xs">{row.error}</span>
+                                                                    )}
+                                                                    {row.status === 'completed' && (
+                                                                        <span className="text-green-500 text-xs">✓ Success</span>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {message && (
                                         <div className={`mb-4 p-3 rounded ${message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                             {message}
@@ -517,12 +716,12 @@ export default function DashboardClient() {
 
                                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="mb-4">
-                                            <label className="block text-gray-700 mb-2">Sr No</label>
+                                            <label className="block text-gray-700 mb-2">Next Available Sr No</label>
                                             <input
                                                 type="text"
                                                 value={srNo}
                                                 disabled
-                                                className="w-full px-3 py-2 border rounded-lg bg-gray-100"
+                                                className="w-full px-3 py-2 border rounded-lg bg-gray-100 font-mono"
                                             />
                                         </div>
 

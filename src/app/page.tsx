@@ -394,12 +394,12 @@ export default function Home() {
     {
       name: 'Bulk Chemicals/Commodity',
       description: 'Bulk Chemicals are the fundamental substances used in chemical manufacturing, acting as building blocks for a wide range of products. These materials are often derived from natural resources like fossil fuels, air, water, and minerals. Examples include Acetone, Phenol, Octanol, Isobutanol, Iso Propyl alcohol, Benzene, Toluene, Xylene, ammonia, methanol, hydrochloric acid, sulfuric acid, benzene, ethene, phosphoric acid, sodium carbonate, calcium chloride, chlorine, hydrogen, sulfur, and butadiene.',
-      image: '/industry.jpg'
+      image: '/BulkChemicalsCommodity.jpg'
     },
     {
       name: 'Chemical Intermediate',
       description: 'chemical intermediate is reacted with other chemicals to obtain the desired product. its wide application in various end-use industries such as agriculture, pharmaceuticals, pulp and paper, detergents, textiles and polymer productions. Example of chemical intermediates products we supply are Ethylene amines,  Monochloroacetic Acid (MCA), Hydrogen peroxide and Sodium chlorate, Aminoethylethanolamine',
-      image: '/agriculture.jpg'
+      image: '/ChemicalIntermediate.jpg'
     },
   ];
 
