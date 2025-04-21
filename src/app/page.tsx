@@ -209,11 +209,6 @@ export default function Home() {
 
   useEffect(() => {
     const fetchResults = async () => {
-      if (!searchQuery.trim()) {
-        setResults([]);
-        return;
-      }
-
       setIsLoading(true);
       try {
         const { data, error, count } = await supabase
@@ -238,6 +233,11 @@ export default function Home() {
     const debounceTimer = setTimeout(fetchResults, 300);
     return () => clearTimeout(debounceTimer);
   }, [searchQuery, currentPage]);
+
+  // Reseting pagination 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Auth Modal
   const authModal = showAuthModal && (
@@ -392,25 +392,15 @@ export default function Home() {
 
   const categories = [
     {
-      name: 'Industrial Chemicals',
-      description: 'High-performance chemicals for manufacturing processes',
+      name: 'Bulk Chemicals/Commodity',
+      description: 'Bulk Chemicals are the fundamental substances used in chemical manufacturing, acting as building blocks for a wide range of products. These materials are often derived from natural resources like fossil fuels, air, water, and minerals. Examples include Acetone, Phenol, Octanol, Isobutanol, Iso Propyl alcohol, Benzene, Toluene, Xylene, ammonia, methanol, hydrochloric acid, sulfuric acid, benzene, ethene, phosphoric acid, sodium carbonate, calcium chloride, chlorine, hydrogen, sulfur, and butadiene.',
       image: '/industry.jpg'
     },
     {
-      name: 'Agricultural Solutions',
-      description: 'Specialty chemicals for enhanced crop production',
+      name: 'Chemical Intermediate',
+      description: 'chemical intermediate is reacted with other chemicals to obtain the desired product. its wide application in various end-use industries such as agriculture, pharmaceuticals, pulp and paper, detergents, textiles and polymer productions. Example of chemical intermediates products we supply are Ethylene amines,  Monochloroacetic Acid (MCA), Hydrogen peroxide and Sodium chlorate, Aminoethylethanolamine',
       image: '/agriculture.jpg'
     },
-    {
-      name: 'Pharmaceutical',
-      description: 'API intermediates and fine chemicals',
-      image: '/pharmaceautical.jpg'
-    },
-    {
-      name: 'Water Treatment',
-      description: 'Chemicals for purification and waste management',
-      image: '/watertreatment.jpg'
-    }
   ];
 
 
@@ -578,19 +568,18 @@ export default function Home() {
                 <div className="max-w-3xl mx-auto text-center mb-20">
                   <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
                     <span className="bg-gradient-to-r text-white dark:text-white bg-clip-text text-transparent">
-                      Innovating
+                      Welcome to El­­ate
                     </span>
                     <span className="relative mx-2">
                       <span className="absolute -inset-1 bg-blue-100 dark:bg-blue-900 rounded-lg transform -skew-x-12 opacity-75"></span>
-                      <span className="relative text-white dark:text-white">Chemical Solutions</span>
+                      <span className="relative text-white dark:text-white"></span>
                     </span>
                     <span className="bg-gradient-to-r text-blue-600 dark:text-blue-400">
-                      Worldwide
+                      Chem
                     </span>
                   </h1>
                   <p className="text-lg text-white dark:text-white mb-8 leading-relaxed">
-                    Pioneering sustainable chemistry through cutting-edge innovation and global expertise.
-                    Partner with us for tailored solutions that drive your industrial success.
+                    Effective & user-friendly chemical sourcing platform for buyers.
                   </p>
                   <button className="group bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-all transform hover:-translate-y-0.5 shadow-2xl hover:shadow-blue-500/30 relative overflow-hidden">
                     <div className="flex items-center space-x-2">
@@ -624,7 +613,10 @@ export default function Home() {
                     Global Supplier Network
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-                    Connect with certified chemical suppliers across 150+ countries
+                    1. Get data of suppliers for your required products.
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
+                    2. Get Email id & contact details to directly connect with suppliers.
                   </p>
                 </div>
 
@@ -800,7 +792,7 @@ export default function Home() {
                   </h2>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
                   {categories.map((category, index) => (
                     <div key={index} className="group bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
                       {/* Image Container with proper aspect ratio */}
@@ -828,10 +820,10 @@ export default function Home() {
 
                 <div className="py-20">
                   <div className="bg-blue-600 dark:bg-blue-700 rounded-2xl p-8 text-center text-white">
-                    <h2 className="text-3xl font-bold mb-4">Custom Formulations</h2>
-                    <p className="text-lg mb-8">Need a specialized chemical solution? Our R&D team can develop custom formulations tailored to your requirements.</p>
+                    <h2 className="text-3xl font-bold mb-4">Search Chemical suppliers in easy way</h2>
+                    <p className="text-lg mb-8">Any business related enquiry. Feel free to contact us</p>
                     <button className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                      Request Formulation
+                      Contact Now
                     </button>
                   </div>
                 </div>
@@ -847,15 +839,19 @@ export default function Home() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Pioneering chemical solutions for a sustainable future
+                  Effective & user-friendly chemical sourcing platform for buyers.
                 </p>
               </div>
               <div>
                 <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
                 <div className="space-y-2">
-                  {['Home', 'About', 'Contact'].map((link) => (
-                    <a key={link} href="#" className="block text-gray-400 hover:text-white transition-colors">
-                      {link}
+                  {[
+                    ['Home', '/'],
+                    ['About', '/about'],
+                    ['Contact', '/contact'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
                     </a>
                   ))}
                 </div>
@@ -863,9 +859,12 @@ export default function Home() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Legal</h4>
                 <div className="space-y-2">
-                  {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
-                    <a key={link} href="#" className="block text-gray-400 hover:text-white transition-colors">
-                      {link}
+                  {[
+                    ['Privacy & Policy', '/privacy&policy'],
+                    ['Terms of Service', '/termsofservice'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
                     </a>
                   ))}
                 </div>

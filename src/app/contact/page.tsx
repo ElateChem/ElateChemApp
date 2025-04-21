@@ -393,9 +393,13 @@ export default function Contact() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
                 <div className="space-y-2">
-                  {['Home', 'About', 'Contact'].map((link) => (
-                    <a key={link} href="#" className="block text-gray-400 hover:text-white transition-colors">
-                      {link}
+                  {[
+                    ['Home', '/'],
+                    ['About', '/about'],
+                    ['Contact', '/contact'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
                     </a>
                   ))}
                 </div>
@@ -403,9 +407,12 @@ export default function Contact() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Legal</h4>
                 <div className="space-y-2">
-                  {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
-                    <a key={link} href="#" className="block text-gray-400 hover:text-white transition-colors">
-                      {link}
+                  {[
+                    ['Privacy & Policy', '/privacy&policy'],
+                    ['Terms of Service', '/termsofservice'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
                     </a>
                   ))}
                 </div>

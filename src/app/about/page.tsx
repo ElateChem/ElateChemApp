@@ -189,7 +189,7 @@ export default function About() {
                   </span>
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                  Pioneering chemical innovation since 2003, delivering excellence across global markets
+                  Effective & user-friendly chemical sourcing platform for buyers.
                 </p>
               </div>
 
@@ -199,8 +199,7 @@ export default function About() {
                   <div className="space-y-4">
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Story</h2>
                     <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                      Founded in 2003, Elate Chem has grown from a regional supplier to a global leader in chemical
-                      solutions. Our journey has been marked by continuous innovation and strategic partnerships.
+                      Being Procurement Professional, we are aware how important is sourcing to get right product from right source. We are providing data of all relevant suppliers from India, China, Japan, Korea, Taiwan, US and other countries which help you to add more value at your work. we are providing vendor data base for all key materials lie Petrochemicals, Bulk materials, Agrochemicals, Specialty chemicals.
                     </p>
                   </div>
                   <img
@@ -254,9 +253,13 @@ export default function About() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
                 <div className="space-y-2">
-                  {['Home', 'About', 'Contact'].map((link) => (
-                    <a key={link} href="#" className="block text-gray-400 hover:text-white transition-colors">
-                      {link}
+                  {[
+                    ['Home', '/'],
+                    ['About', '/about'],
+                    ['Contact', '/contact'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
                     </a>
                   ))}
                 </div>
@@ -264,9 +267,12 @@ export default function About() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Legal</h4>
                 <div className="space-y-2">
-                  {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
-                    <a key={link} href="#" className="block text-gray-400 hover:text-white transition-colors">
-                      {link}
+                  {[
+                    ['Privacy & Policy', '/privacy&policy'],
+                    ['Terms of Service', '/termsofservice'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
                     </a>
                   ))}
                 </div>

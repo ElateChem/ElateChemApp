@@ -6,23 +6,31 @@ import { usePathname } from "next/navigation";
 
 export const useSEO = () => {
   const pathname = usePathname();
-  const meta = seoConfig[pathname as keyof typeof seoConfig] || seoConfig["/"];
+  const meta = seoConfig[pathname] || seoConfig["/"];
 
   useEffect(() => {
-    // Update document title
-    document.title = `${meta.title} | ${siteConfig.name}`;
-    
-    // Update meta tags dynamically
-    const descriptionTag = document.querySelector('meta[name="description"]');
-    if (descriptionTag) {
-      descriptionTag.setAttribute("content", meta.description);
+    // 1) title + meta tags
+    document.title = meta.title;
+    const setMeta = (selector: string, attr: string, value: string) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute(attr, value);
+    };
+    setMeta('meta[name="description"]', "content", meta.description);
+    setMeta('meta[name="keywords"]', "content", meta.keywords.join(", "));
+    if (meta.noIndex) {
+      setMeta('meta[name="robots"]', "content", "noindex");
     }
 
-    const keywordsTag = document.querySelector('meta[name="keywords"]');
-    if (keywordsTag) {
-      keywordsTag.setAttribute("content", meta.keywords.join(", "));
+    // 2) favicon
+    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.setAttribute("rel", "icon");
+      document.head.appendChild(link);
     }
+    link.setAttribute("href", meta.icon);
   }, [pathname, meta]);
+
 
   return meta;
 };
