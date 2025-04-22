@@ -207,10 +207,19 @@ export default function Home() {
   const [results, setResults] = useState<ChemicalResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Modified the useEffect that fetches results
   useEffect(() => {
     const fetchResults = async () => {
       setIsLoading(true);
       try {
+        // Clear results and reset pagination if search query is empty
+        if (!searchQuery.trim()) {
+          setResults([]);
+          setCurrentPage(1);
+          setTotalPages(0);
+          return;
+        }
+
         const { data, error, count } = await supabase
           .from('vendors_list')
           .select('*', { count: 'exact' })
@@ -233,11 +242,6 @@ export default function Home() {
     const debounceTimer = setTimeout(fetchResults, 300);
     return () => clearTimeout(debounceTimer);
   }, [searchQuery, currentPage]);
-
-  // Reseting pagination 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
 
   // Auth Modal
   const authModal = showAuthModal && (
@@ -822,9 +826,11 @@ export default function Home() {
                   <div className="bg-blue-600 dark:bg-blue-700 rounded-2xl p-8 text-center text-white">
                     <h2 className="text-3xl font-bold mb-4">Search Chemical suppliers in easy way</h2>
                     <p className="text-lg mb-8">Any business related enquiry. Feel free to contact us</p>
-                    <button className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                      Contact Now
-                    </button>
+                    <Link href="/contact">
+                      <button className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                        Contact Now
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>

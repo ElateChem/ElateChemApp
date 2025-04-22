@@ -429,30 +429,32 @@ export default function DashboardClient() {
         </button>
     )
 
-    // Checking Unique SR.NO
+    // useEffect hook for srno update
+    const fetchLatestSrNo = async () => {
+        try {
+            const { data: existingSrno, error } = await supabase
+                .from('vendors_list')
+                .select('Srno');
+
+            if (error) throw error;
+
+            const maxSrno = existingSrno.reduce((max, item) => {
+                const current = parseInt(item.Srno);
+                return current > max ? current : max;
+            }, 0);
+
+            setSrNo((maxSrno + 1).toString());
+        } catch (error) {
+            console.error('Error generating SrNo:', error);
+            setSrNo('1');
+        }
+    };
     useEffect(() => {
-        const fetchMaxSrNo = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('vendors_list')
-                    .select('Srno');
-
-                if (error) throw error;
-
-                const maxSrno = data.reduce((max, item) => {
-                    const current = parseInt(item.Srno);
-                    return current > max ? current : max;
-                }, 0);
-
-                setSrNo((maxSrno + 1).toString());
-            } catch (error) {
-                console.error('Error generating SrNo:', error);
-                setSrNo('1');
-            }
-        };
-
-        fetchMaxSrNo();
-    }, []);
+        if (activeTab === 'add-vendor') {
+          fetchLatestSrNo();
+        }
+      }, [activeTab]);
+    
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -682,8 +684,8 @@ export default function DashboardClient() {
                                                                             <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
                                                                         )}
                                                                         <span className={`text-sm ${row.status === 'completed' ? 'text-green-600' :
-                                                                                row.status === 'error' ? 'text-red-600' :
-                                                                                    'text-gray-600'
+                                                                            row.status === 'error' ? 'text-red-600' :
+                                                                                'text-gray-600'
                                                                             }`}>
                                                                             {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
                                                                         </span>
