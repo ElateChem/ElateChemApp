@@ -212,10 +212,8 @@ export default function Home() {
     const fetchResults = async () => {
       setIsLoading(true);
       try {
-        // Clear results and reset pagination if search query is empty
         if (!searchQuery.trim()) {
           setResults([]);
-          setCurrentPage(1);
           setTotalPages(0);
           return;
         }
@@ -229,19 +227,23 @@ export default function Home() {
         if (error) throw error;
 
         setResults(data as ChemicalResult[] || []);
-        if (count) {
-          setTotalPages(Math.ceil(count / itemsPerPage));
-        }
+        if (count) setTotalPages(Math.ceil(count / itemsPerPage));
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
     const debounceTimer = setTimeout(fetchResults, 300);
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, currentPage]);
+  }, [searchQuery, currentPage, itemsPerPage]);
+
+  // Add this useEffect to reset current page when search query changes
+  useEffect(() => {
+    // Reset to first page whenever search query changes
+    setCurrentPage(1);
+  }, [searchQuery]);
+
 
   // Auth Modal
   const authModal = showAuthModal && (
@@ -412,7 +414,10 @@ export default function Home() {
   const PaginationControls = () => (
     <div className="flex justify-center items-center gap-4 mt-8">
       <button
-        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+        onClick={() => {
+          setCurrentPage(p => Math.max(1, p - 1));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         disabled={currentPage === 1}
         className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg disabled:opacity-50"
       >
@@ -422,7 +427,10 @@ export default function Home() {
         Page {currentPage} of {totalPages}
       </span>
       <button
-        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+        onClick={() => {
+          setCurrentPage(p => Math.min(totalPages, p + 1));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         disabled={currentPage === totalPages}
         className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg disabled:opacity-50"
       >

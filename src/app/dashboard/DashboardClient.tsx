@@ -389,7 +389,10 @@ export default function DashboardClient() {
                     .select('*', { count: 'exact' });
 
                 if (searchQuery) {
-                    query = query.or(`Casno.ilike.%${searchQuery}%,Chemicalname.ilike.%${searchQuery}%`);
+                    // Added Suppliername to the search query
+                    query = query.or(
+                        `Casno.ilike.%${searchQuery}%,Chemicalname.ilike.%${searchQuery}%,Suppliername.ilike.%${searchQuery}%`
+                    );
                 }
 
                 const { data, error, count } = await query
@@ -732,7 +735,7 @@ export default function DashboardClient() {
                                     <div className="mb-6">
                                         <input
                                             type="text"
-                                            placeholder="Search by CAS Number or Chemical Name"
+                                            placeholder="Search by CAS Number, Chemical Name & Supplier Name"
                                             value={searchQuery}
                                             onChange={(e) => {
                                                 setSearchQuery(e.target.value);
