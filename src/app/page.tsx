@@ -685,14 +685,29 @@ export default function Home() {
                                 <span>{result.Country}</span>
                               </div>
                               <div className="flex justify-between">
+                                <span className="text-gray-500 dark:text-gray-400">Emails & Links:</span>
+                                <div className="flex flex-col items-end">
+                                  {result["Email&link"] && (
+                                    <a
+                                      href={`mailto:${result["Email&link"]}`}
+                                      className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                                    >
+                                      {result["Email&link"]}
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex justify-between">
                                 <span className="text-gray-500 dark:text-gray-400">Contact:</span>
                                 <div className="flex flex-col items-end">
-                                  <a href={`mailto:${result["Email&link"]}`} className="text-blue-600 hover:underline">
-                                    {result["Email&link"]}
-                                  </a>
-                                  <a href={`tel:${result.Phoneno}`} className="text-gray-600 dark:text-gray-300">
-                                    {result.Phoneno}
-                                  </a>
+                                  {result.Phoneno && (
+                                    <a
+                                      href={`tel:${result.Phoneno}`}
+                                      className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                                    >
+                                      {result.Phoneno}
+                                    </a>
+                                  )}
                                 </div>
                               </div>
                             </div>
