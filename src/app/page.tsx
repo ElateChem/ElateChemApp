@@ -396,6 +396,7 @@ export default function Home() {
     </div>
   );
 
+  // Categories
   const categories = [
     {
       name: 'Bulk Chemicals/Commodity',
@@ -406,6 +407,16 @@ export default function Home() {
       name: 'Chemical Intermediate',
       description: 'chemical intermediate is reacted with other chemicals to obtain the desired product. its wide application in various end-use industries such as agriculture, pharmaceuticals, pulp and paper, detergents, textiles and polymer productions. Example of chemical intermediates products we supply are Ethylene amines,  Monochloroacetic Acid (MCA), Hydrogen peroxide and Sodium chlorate, Aminoethylethanolamine',
       image: '/ChemicalIntermediate.jpg'
+    },
+    {
+      name: 'Petrochemicals & Intermediates',
+      description: 'Petrochemicals are chemicals derived from petroleum or natural gas. They are an essential part of the chemical industry as the demand for synthetic materials grows continually and plays a major part in todays economy and society. Petrochemicals are used to manufacture thousands of different products that people use daily, including plastics, medicines, cosmetics, furniture, appliances, electronics, solar power panels, and wind turbines. Petrochemical intermediates are generally produced by chemical conversion of primary petrochemicals to form more complicated derivative products. Like Methanol, Ethanol, Isopropanol, Acetone, Ethyl acetate, Butyl acetate, Benzene, Toluene, Xylenes, Acrylic Acid, Normal Butanol, Iso Butanol, 2-ethylhexanol, Butyl Acrylate, 2-ethylhexyl acrylate',
+      image: '/watertreatment.jpg'
+    },
+    {
+      name: 'Glycol & Derivatives',
+      description: 'Glycol is a versatile chemical used in many industries due to its ability to function as an antifreeze, solvent, and crucial component in certain manufacturing processes, making it invaluable for temperature control and system efficiency. The two main types are ethylene glycol and the less toxic propylene glycol, used respectively in antifreeze and food and cosmetic products. Choosing the right type is essential for safety and regulatory compliance Glycol ethers are a family of more than 80 chemicals consisting of oxygenated solvents largely used in industrial processes and consumer products (paints, varnishes, detergents, etc.). The most highly used glycol ethers are ethylene glycol butyl ether and propylene glycol methyl ether, Propylene Glycol Monomethyl Ether Acetate, Dipropylene Glycol Monomethyl Ether, Ethylene glycol diethyl ether',
+      image: '/agriculture.jpg'
     },
   ];
 
@@ -621,15 +632,9 @@ export default function Home() {
             <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-white dark:bg-gray-800 py-16 shadow-xl">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
                     Global Supplier Network
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-                    1. Get data of suppliers for your required products.
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-                    2. Get Email id & contact details to directly connect with suppliers.
-                  </p>
                 </div>
 
                 <div className="relative mx-auto max-w-2xl">
@@ -819,32 +824,66 @@ export default function Home() {
                   </h2>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-                  {categories.map((category, index) => (
-                    <div key={index} className="group bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-                      {/* Image Container with proper aspect ratio */}
-                      <div className="relative h-48 bg-gray-100 dark:bg-gray-600 overflow-hidden">
-                        <img
-                          src={category.image} // Update with your actual image path
-                          alt={category.name}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      </div>
-
-                      {/* Card Content */}
-                      <div className="p-6">
-                        <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-                          {category.name}
+                {/* Updated Benefits Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-20">
+                  <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-start space-x-4">
+                      <span className="text-2xl">🔍</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          Supplier Database Access
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                          {category.description}
+                        <p className="text-gray-600 dark:text-gray-300">
+                          Instantly get data of verified suppliers for your required products
                         </p>
                       </div>
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-start space-x-4">
+                      <span className="text-2xl">📩</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          Direct Contact Details
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300">
+                          Access email & contact information to connect directly with suppliers
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-start space-x-4">
+                      <span className="text-2xl">🧪</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          Chemical Applications
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300">
+                          Detailed information about applications of major Chemical Categories
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-start space-x-4">
+                      <span className="text-2xl">📦</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          Clear Classification
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300">
+                          Easy differentiation between manufacturers and traders
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
+                {/* Rest of the section remains same */}
                 <div className="py-20">
                   <div className="bg-blue-600 dark:bg-blue-700 rounded-2xl p-8 text-center text-white">
                     <h2 className="text-3xl font-bold mb-4">Search Chemical suppliers in easy way</h2>

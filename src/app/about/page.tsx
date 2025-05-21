@@ -199,7 +199,7 @@ export default function About() {
                   <div className="space-y-4">
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Story</h2>
                     <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                      Being Procurement Professional, we are aware how important is sourcing to get right product from right source. We are providing data of all relevant suppliers from India, China, Japan, Korea, Taiwan, US and other countries which help you to add more value at your work. we are providing vendor data base for all key materials lie Petrochemicals, Bulk materials, Agrochemicals, Specialty chemicals.
+                      Being Procurement Professional, we are aware how important is sourcing to get right product from right source. We are providing data of all relevant suppliers from India, China, Japan, Korea, Taiwan, US and other countries which help you to add more value at your work. we are providing vendor data base for all key materials like Petrochemicals, Bulk materials, Agrochemicals, Specialty chemicals.
                     </p>
                   </div>
                   <img
@@ -216,23 +216,10 @@ export default function About() {
                     className="bg-gray-100 dark:bg-gray-700 h-64 rounded-xl object-cover w-full"
                   />
                   <div className="space-y-4">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Mission</h2>
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Vision</h2>
                     <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                      To deliver sustainable chemical solutions that empower industries while maintaining the highest
-                      standards of safety and environmental responsibility.
+                      To provide Effective & user-friendly chemical sourcing platform for buyers.
                     </p>
-                  </div>
-                </section>
-
-                <section className="text-center py-16">
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Global Presence</h2>
-                  <div className="grid md:grid-cols-4 gap-8">
-                    {['150+ Countries Data', '500+ Happy Clients', 'ISO Certified Soon', 'Wide Support'].map((item) => (
-                      <div key={item} className="p-6 bg-white dark:bg-gray-700 rounded-xl shadow-md">
-                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">{item.replace(/[^0-9]/g, '')}+</div>
-                        <div className="text-gray-600 dark:text-gray-300">{item.replace(/[0-9+]/g, '')}</div>
-                      </div>
-                    ))}
                   </div>
                 </section>
               </div>

@@ -551,6 +551,59 @@ export default function DashboardClient() {
         }
     };
 
+    // Download all vendor data
+    const handleDownloadCSV = async () => {
+        setLoading(true);
+        try {
+            // Fetch all vendors without pagination
+            const { data, error } = await supabase
+                .from('vendors_list')
+                .select('*')
+                .order('Srno', { ascending: true });
+
+            if (error) throw error;
+            if (!data || data.length === 0) {
+                setMessage('No vendors found to download');
+                return;
+            }
+
+            // Create CSV content
+            const csv = Papa.unparse(data, {
+                columns: [
+                    'Srno',
+                    'Chemicalname',
+                    'Category',
+                    'Casno',
+                    'Suppliername',
+                    'Email&link',
+                    'Phoneno',
+                    'Businessstatus',
+                    'Country'
+                ],
+                header: true
+            });
+
+            // Create blob and download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'vendors-export.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setMessage('CSV download started successfully');
+        } catch (error: any) {
+            console.error('Download error:', error);
+            setMessage('Error downloading CSV: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <SeoProvider>
             <div className="min-h-screen bg-gray-100">
@@ -743,6 +796,13 @@ export default function DashboardClient() {
                                             }}
                                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                                         />
+                                        <button
+                                            onClick={handleDownloadCSV}
+                                            disabled={isLoadingVendors}
+                                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 whitespace-nowrap"
+                                        >
+                                            Download Data as CSV
+                                        </button>
                                     </div>
 
                                     {isLoadingVendors ? (
