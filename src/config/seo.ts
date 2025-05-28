@@ -53,5 +53,5 @@ export type PageSeo = {
   description: string
   keywords: string[]
   noIndex?: boolean
-  icon: string         // ← new
+  icon: string        
 }

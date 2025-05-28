@@ -219,7 +219,7 @@ export default function Home() {
         }
 
         const { data, error, count } = await supabase
-          .from('vendors_list')
+          .from('vendors_data')
           .select('*', { count: 'exact' })
           .or(`Chemicalname.ilike.%${searchQuery}%,Casno.ilike.%${searchQuery}%`)
           .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
@@ -395,30 +395,6 @@ export default function Home() {
       </div>
     </div>
   );
-
-  // Categories
-  const categories = [
-    {
-      name: 'Bulk Chemicals/Commodity',
-      description: 'Bulk Chemicals are the fundamental substances used in chemical manufacturing, acting as building blocks for a wide range of products. These materials are often derived from natural resources like fossil fuels, air, water, and minerals. Examples include Acetone, Phenol, Octanol, Isobutanol, Iso Propyl alcohol, Benzene, Toluene, Xylene, ammonia, methanol, hydrochloric acid, sulfuric acid, benzene, ethene, phosphoric acid, sodium carbonate, calcium chloride, chlorine, hydrogen, sulfur, and butadiene.',
-      image: '/BulkChemicalsCommodity.jpg'
-    },
-    {
-      name: 'Chemical Intermediate',
-      description: 'chemical intermediate is reacted with other chemicals to obtain the desired product. its wide application in various end-use industries such as agriculture, pharmaceuticals, pulp and paper, detergents, textiles and polymer productions. Example of chemical intermediates products we supply are Ethylene amines,  Monochloroacetic Acid (MCA), Hydrogen peroxide and Sodium chlorate, Aminoethylethanolamine',
-      image: '/ChemicalIntermediate.jpg'
-    },
-    {
-      name: 'Petrochemicals & Intermediates',
-      description: 'Petrochemicals are chemicals derived from petroleum or natural gas. They are an essential part of the chemical industry as the demand for synthetic materials grows continually and plays a major part in todays economy and society. Petrochemicals are used to manufacture thousands of different products that people use daily, including plastics, medicines, cosmetics, furniture, appliances, electronics, solar power panels, and wind turbines. Petrochemical intermediates are generally produced by chemical conversion of primary petrochemicals to form more complicated derivative products. Like Methanol, Ethanol, Isopropanol, Acetone, Ethyl acetate, Butyl acetate, Benzene, Toluene, Xylenes, Acrylic Acid, Normal Butanol, Iso Butanol, 2-ethylhexanol, Butyl Acrylate, 2-ethylhexyl acrylate',
-      image: '/watertreatment.jpg'
-    },
-    {
-      name: 'Glycol & Derivatives',
-      description: 'Glycol is a versatile chemical used in many industries due to its ability to function as an antifreeze, solvent, and crucial component in certain manufacturing processes, making it invaluable for temperature control and system efficiency. The two main types are ethylene glycol and the less toxic propylene glycol, used respectively in antifreeze and food and cosmetic products. Choosing the right type is essential for safety and regulatory compliance Glycol ethers are a family of more than 80 chemicals consisting of oxygenated solvents largely used in industrial processes and consumer products (paints, varnishes, detergents, etc.). The most highly used glycol ethers are ethylene glycol butyl ether and propylene glycol methyl ether, Propylene Glycol Monomethyl Ether Acetate, Dipropylene Glycol Monomethyl Ether, Ethylene glycol diethyl ether',
-      image: '/agriculture.jpg'
-    },
-  ];
 
 
   // Pagination controls component
@@ -655,89 +631,95 @@ export default function Home() {
                 </div>
 
                 {/* Enhanced Results Section */}
-                <div className="mt-8 space-y-4">
+                <div className="mt-8">
                   {isLoading ? (
                     <div className="flex justify-center items-center py-8">
                       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   ) : results.length > 0 ? (
                     <>
-                      {results.slice(0, user ? results.length : 1).map((result) => (
-                        <div key={result.Srno} className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Left Column */}
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Chemical:</span>
-                                <span className="font-medium">{result.Chemicalname}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Category:</span>
-                                <span>{result.Category}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">CAS Number:</span>
-                                <span className="font-mono">{result.Casno}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Business Status:</span>
-                                <span className={`px-2 py-1 rounded ${result.Businessstatus === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {results.slice(0, user ? results.length : 2).map((result) => (
+                          <div key={result.Srno} className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700">
+                            <div className="p-6">
+                              {/* Header with chemical name and status */}
+                              <div className="flex justify-between items-start mb-4">
+                                <div>
+                                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {result.Chemicalname}
+                                  </h3>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {result.Category}
+                                  </p>
+                                </div>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${result.Businessstatus === 'Active'
+                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                  }`}>
                                   {result.Businessstatus}
                                 </span>
                               </div>
-                            </div>
 
-                            {/* Right Column */}
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Supplier:</span>
-                                <span className="font-medium">{result.Suppliername}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Country:</span>
-                                <span>{result.Country}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Emails & Links:</span>
-                                <div className="flex flex-col items-end">
-                                  {result["Email&link"] && (
-                                    <a
-                                      href={`mailto:${result["Email&link"]}`}
-                                      className="text-blue-600 dark:text-blue-400 hover:underline break-all"
-                                    >
-                                      {result["Email&link"]}
-                                    </a>
-                                  )}
+                              {/* Supplier info */}
+                              <div className="mb-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="font-medium text-gray-900 dark:text-white">
+                                    {result.Suppliername}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                  </svg>
+                                  <span>{result.Country}</span>
                                 </div>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500 dark:text-gray-400">Contact:</span>
-                                <div className="flex flex-col items-end">
-                                  {result.Phoneno && (
-                                    <a
-                                      href={`tel:${result.Phoneno}`}
-                                      className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                                    >
-                                      {result.Phoneno}
-                                    </a>
-                                  )}
+
+                              {/* Detailed information */}
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">CAS Number</p>
+                                  <p className="font-mono text-sm">{result.Casno}</p>
+                                </div>
+
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phone</p>
+                                  <a
+                                    href={`tel:${result.Phoneno}`}
+                                    className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                                  >
+                                    {result.Phoneno}
+                                  </a>
+                                </div>
+
+                                <div className="col-span-2">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</p>
+                                  <a
+                                    href={`mailto:${result["Email&link"]}`}
+                                    className="text-blue-600 dark:text-blue-400 hover:underline break-all text-sm"
+                                  >
+                                    {result["Email&link"]}
+                                  </a>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
 
                       <PaginationControls />
 
                       {!user && results.length > 1 && (
-                        <div className="text-center py-8">
+                        <div className="mt-8 text-center py-8">
                           <div className="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-md">
                             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                               Unlock Full Supplier Access
                             </h3>
                             <p className="text-gray-600 dark:text-gray-300 mb-6">
-                              Sign-up Now to view all {results.length} matching suppliers
+                              Sign-up Now to get Complete Access to the Suppliers Data
                             </p>
                             <button
                               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
