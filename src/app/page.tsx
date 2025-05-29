@@ -638,73 +638,47 @@ export default function Home() {
                     </div>
                   ) : results.length > 0 ? (
                     <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {results.slice(0, user ? results.length : 2).map((result) => (
-                          <div key={result.Srno} className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700">
-                            <div className="p-6">
-                              {/* Header with chemical name and status */}
-                              <div className="flex justify-between items-start mb-4">
-                                <div>
-                                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {result.Chemicalname}
-                                  </h3>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {result.Category}
-                                  </p>
-                                </div>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${result.Businessstatus === 'Active'
-                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                  }`}>
-                                  {result.Businessstatus}
-                                </span>
+                          <div key={result.Srno} className="border rounded-lg p-4 shadow-sm bg-white dark:bg-gray-800">
+                            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+                              <span className="font-semibold dark:text-gray-300">Chemical Name:</span>
+                              <span className="truncate dark:text-gray-200">{result.Chemicalname}</span>
+
+                              <span className="font-semibold dark:text-gray-300">Category:</span>
+                              <span className="truncate dark:text-gray-200">{result.Category}</span>
+
+                              <span className="font-semibold dark:text-gray-300">CAS No:</span>
+                              <span className="truncate dark:text-gray-200">{result.Casno}</span>
+
+                              <span className="font-semibold dark:text-gray-300">Supplier:</span>
+                              <span className="truncate dark:text-gray-200">{result.Suppliername}</span>
+
+                              <span className="font-semibold dark:text-gray-300">Contact:</span>
+                              <div className="min-w-0">
+                                <a
+                                  href={`mailto:${result["Email&link"]}`}
+                                  className="truncate hover:text-clip hover:overflow-visible hover:whitespace-normal text-blue-600 dark:text-blue-400"
+                                >
+                                  {result["Email&link"]}
+                                </a>
                               </div>
 
-                              {/* Supplier info */}
-                              <div className="mb-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                  </svg>
-                                  <span className="font-medium text-gray-900 dark:text-white">
-                                    {result.Suppliername}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                  </svg>
-                                  <span>{result.Country}</span>
-                                </div>
-                              </div>
+                              <span className="font-semibold dark:text-gray-300">Phone No:</span>
+                              <a
+                                href={`tel:${result.Phoneno}`}
+                                className="truncate dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {result.Phoneno}
+                              </a>
 
-                              {/* Detailed information */}
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">CAS Number</p>
-                                  <p className="font-mono text-sm">{result.Casno}</p>
-                                </div>
+                              <span className="font-semibold dark:text-gray-300">Business Status:</span>
+                              <span className={`truncate ${result.Businessstatus === 'Active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                {result.Businessstatus}
+                              </span>
 
-                                <div>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phone</p>
-                                  <a
-                                    href={`tel:${result.Phoneno}`}
-                                    className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
-                                  >
-                                    {result.Phoneno}
-                                  </a>
-                                </div>
-
-                                <div className="col-span-2">
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</p>
-                                  <a
-                                    href={`mailto:${result["Email&link"]}`}
-                                    className="text-blue-600 dark:text-blue-400 hover:underline break-all text-sm"
-                                  >
-                                    {result["Email&link"]}
-                                  </a>
-                                </div>
-                              </div>
+                              <span className="font-semibold dark:text-gray-300">Country:</span>
+                              <span className="truncate dark:text-gray-200">{result.Country}</span>
                             </div>
                           </div>
                         ))}
