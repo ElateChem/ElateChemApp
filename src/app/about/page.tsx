@@ -265,9 +265,9 @@ export default function About() {
                 </div>
               </div>
               <div>
-                <h4 className="text-lg font-semibold mb-4">Connect</h4>
+                <h4 className="text-lg font-semibold mb-4">Socials Connect</h4>
                 <div className="flex space-x-4">
-                  {['LinkedIn', 'Twitter', 'YouTube'].map((platform) => (
+                  {['Coming Soon'].map((platform) => (
                     <a key={platform} href="#" className="text-gray-400 hover:text-white transition-colors">
                       {platform}
                     </a>

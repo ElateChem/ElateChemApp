@@ -332,7 +332,7 @@ export default function Contact() {
                         </div>
                         <div>
                           <p className="text-gray-600 dark:text-gray-300">Email</p>
-                          <p className="font-medium text-gray-800 dark:text-white">contact@elatechem.com</p>
+                          <p className="font-medium text-gray-800 dark:text-white">elatechem@gmail.com</p>
                         </div>
                       </div>
 
@@ -344,7 +344,7 @@ export default function Contact() {
                         </div>
                         <div>
                           <p className="text-gray-600 dark:text-gray-300">Phone</p>
-                          <p className="font-medium text-gray-800 dark:text-white">+1 (555) 123-4567</p>
+                          <p className="font-medium text-gray-800 dark:text-white">Updating Soon</p>
                         </div>
                       </div>
 
@@ -356,10 +356,9 @@ export default function Contact() {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-gray-600 dark:text-gray-300">Headquarters</p>
+                          <p className="text-gray-600 dark:text-gray-300">Location</p>
                           <p className="font-medium text-gray-800 dark:text-white">
-                            123 Chemical Avenue<br />
-                            Innovation Park, CA 94016
+                            Updating Soon<br />
                           </p>
                         </div>
                       </div>
@@ -367,11 +366,10 @@ export default function Contact() {
                   </div>
 
                   <div className="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Office Hours</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Business Enquiry</h2>
                     <div className="space-y-2">
-                      <p className="text-gray-600 dark:text-gray-300">Monday - Friday: 8 AM - 6 PM PST</p>
-                      <p className="text-gray-600 dark:text-gray-300">Saturday: 9 AM - 2 PM PST</p>
-                      <p className="text-gray-600 dark:text-gray-300">Sunday: Closed</p>
+                      <p className="text-gray-600 dark:text-gray-300">Mail Directly to - elatechem@gmail.com</p>
+                      <p className="text-gray-600 dark:text-gray-300">Promotion or any other vendors related business</p>
                     </div>
                   </div>
                 </div>
@@ -418,9 +416,9 @@ export default function Contact() {
                 </div>
               </div>
               <div>
-                <h4 className="text-lg font-semibold mb-4">Connect</h4>
+                <h4 className="text-lg font-semibold mb-4">Socials Connect</h4>
                 <div className="flex space-x-4">
-                  {['LinkedIn', 'Twitter', 'YouTube'].map((platform) => (
+                  {['Coming Soon'].map((platform) => (
                     <a key={platform} href="#" className="text-gray-400 hover:text-white transition-colors">
                       {platform}
                     </a>

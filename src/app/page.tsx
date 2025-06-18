@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient, User } from '@supabase/supabase-js';
 import SeoProvider from "@/components/seo-provider";
+import { useRef } from 'react';
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,17 +26,145 @@ interface ChemicalResult {
 }
 
 export default function Home() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter(); //Router for page linking
+  const [user, setUser] = useState<User | null>(null);  //state for setting up user session
+  const [showAuthModal, setShowAuthModal] = useState(false); //state for display Modal for login ^ register
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login'); //state for authmode ( modal form reg / login )
+  const [showDropdown, setShowDropdown] = useState(false); //state for login & logout dropdown
+  const [currentPage, setCurrentPage] = useState(1); //state for setting current page in search
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(0); //state for setting total pages of data
+  const [showPassword, setShowPassword] = useState(false); //state for visiblity of pass
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); //state for visiblity of confirm pass
 
-  // Auth form states
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = useState('');
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+
+  const ForgotPasswordForm = () => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+      // Focus input when component mounts
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, []);
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          Reset Your Password
+        </h2>
+
+        {forgotPasswordSuccess ? (
+          <div className="text-green-600 dark:text-green-400 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            Password reset link sent to your email! Please check your inbox.
+          </div>
+        ) : (
+          <>
+            <p className="text-gray-600 dark:text-gray-300">
+              Enter your email to receive a password reset link
+            </p>
+
+            <input
+              ref={inputRef}
+              type="email"
+              placeholder="Your registered email"
+              required
+              value={forgotPasswordEmail}
+              onChange={(e) => setForgotPasswordEmail(e.target.value)}
+              className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+            />
+
+            {forgotPasswordError && (
+              <div className="text-red-500 text-sm">{forgotPasswordError}</div>
+            )}
+
+            <button
+              onClick={handlePasswordReset}
+              disabled={isForgotPasswordLoading}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium relative"
+            >
+              {isForgotPasswordLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Sending...
+                </div>
+              ) : 'Send Reset Link'}
+            </button>
+          </>
+        )}
+
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => {
+              setIsForgotPassword(false);
+              setForgotPasswordError('');
+              setForgotPasswordSuccess(false);
+            }}
+            className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+          >
+            Back to Login
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const handlePasswordReset = async () => {
+    setForgotPasswordError('');
+    setIsForgotPasswordLoading(true);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(forgotPasswordEmail)) {
+      setForgotPasswordError('Please enter a valid email address');
+      setIsForgotPasswordLoading(false);
+      return;
+    }
+    try {
+      // Check if email exists in users table
+      const { data, error } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', forgotPasswordEmail)
+        .single();
+
+      if (error || !data) {
+        throw new Error('Email not found. Please check your email or register for a new account.');
+      }
+      // Send password reset email
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `www.elatechem.com/auth/reset-password`,
+      });
+      if (resetError) throw resetError;
+      setForgotPasswordSuccess(true);
+    } catch (err) {
+      setForgotPasswordError(err instanceof Error ? err.message : 'Failed to send reset link');
+    } finally {
+      setIsForgotPasswordLoading(false);
+    }
+  };
+
+  // Auth form states of register account form
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -43,26 +173,29 @@ export default function Home() {
     password: '',
     confirmPassword: ''
   });
+
+  // Error Array
   const [error, setError] = useState('');
 
+  // Auth form states of send chemical request
   const [formRequest, setFormRequest] = useState({
     chemicalName: '',
     casNumber: '',
     contactInfo: ''
   });
+  // States for submission of chemical request
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [requestSubmitted, setRequestSubmitted] = useState(false);
 
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);//state for loading text in register and login button
 
-
-  // Add this handler function
+  //handler function for chemical request
   const handleNotFoundRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmittingRequest(true);
     try {
       const { error } = await supabase
-        .from('search_requests') // Create this table in your Supabase
+        .from('search_requests')
         .insert([{
           chemical_name: formRequest.chemicalName,
           cas_number: formRequest.casNumber,
@@ -91,7 +224,7 @@ export default function Home() {
     getSession();
   }, []);
 
-  // Auth state listener
+  // Auth state listener for login
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
@@ -100,49 +233,51 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Auth form handlers
+  // Auth resgister form handlers
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsAuthLoading(true);
-    // Common validations
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
+      setIsAuthLoading(false);
       return;
     }
 
     if (authMode === 'login') {
       // Login validations
-      if (formData.password.length < 6) {
-        setError('Password must be at least 6 characters');
+      if (formData.password.length < 8) {
+        setError('Password must be at least 8 characters');
+        setIsAuthLoading(false);
         return;
       }
     } else {
       // Registration validations
       if (!formData.company.trim()) {
         setError('Company name is required');
+        setIsAuthLoading(false);
         return;
       }
-
       if (formData.mobile.length !== 10) {
         setError('Mobile number must be 10 digits');
+        setIsAuthLoading(false);
         return;
       }
-
       if (formData.password.length < 8) {
         setError('Password must be at least 8 characters');
+        setIsAuthLoading(false);
         return;
       }
-
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
+        setIsAuthLoading(false);
         return;
       }
     }
-
     if (authMode === 'register' && formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setIsAuthLoading(false);
       return;
     }
 
@@ -172,9 +307,7 @@ export default function Home() {
             mobile: formData.mobile
           }])
           .select();
-
         if (error) throw error;
-
         // Clear form on success
         setFormData({
           name: '',
@@ -184,24 +317,25 @@ export default function Home() {
           password: '',
           confirmPassword: ''
         });
-
         setError('Registration successful! Please check your email for verification.');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
+      setIsAuthLoading(false);
     } finally {
       setIsAuthLoading(false); // Stop loading regardless of success/failure
     }
 
   };
 
+  // Auth Logout
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setShowDropdown(false);
     router.refresh();
   };
 
-  // 
+  // Navigation and home page function state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<ChemicalResult[]>([]);
@@ -238,7 +372,7 @@ export default function Home() {
     return () => clearTimeout(debounceTimer);
   }, [searchQuery, currentPage, itemsPerPage]);
 
-  // Add this useEffect to reset current page when search query changes
+  // This useEffect to reset current page when search query changes
   useEffect(() => {
     // Reset to first page whenever search query changes
     setCurrentPage(1);
@@ -249,153 +383,199 @@ export default function Home() {
   const authModal = showAuthModal && (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 p-8 rounded-xl w-full max-w-md relative">
-        {/* Close Button */}
         <button
-          onClick={() => setShowAuthModal(false)}
+          onClick={() => {
+            setShowAuthModal(false);
+            setIsForgotPassword(false);
+            setForgotPasswordError('');
+            setForgotPasswordSuccess(false);
+          }}
           className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-          {authMode === 'login' ? 'Login' : 'Register'}
-        </h2>
+        {isForgotPassword ? (
+          <ForgotPasswordForm />
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+              {authMode === 'login' ? 'Login' : 'Register'}
+            </h2>
 
-        {error && <div className="text-red-500 mb-4 text-sm">{error}</div>}
+            {error && <div className="text-red-500 mb-4 text-sm">{error}</div>}
 
-        <form onSubmit={handleAuth} className="space-y-4">
-          {authMode === 'register' && (
-            <>
+            <form onSubmit={handleAuth} className="space-y-4">
+              {authMode === 'register' && (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Company Name"
+                    required
+                    disabled={isAuthLoading}
+                    className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    required
+                    disabled={isAuthLoading}
+                    className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </>
+              )}
+
               <input
-                type="text"
-                placeholder="Company Name"
+                type="email"
+                placeholder="Email"
                 required
                 disabled={isAuthLoading}
                 className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
-              <input
-                type="text"
-                placeholder="Full Name"
-                required
-                disabled={isAuthLoading}
-                className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </>
-          )}
 
-          <input
-            type="email"
-            placeholder="Email"
-            required
-            disabled={isAuthLoading}
-            className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          />
+              {authMode === 'register' && (
+                <input
+                  type="tel"
+                  placeholder="Mobile Number"
+                  required
+                  disabled={isAuthLoading}
+                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  value={formData.mobile}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    setFormData({ ...formData, mobile: value.slice(0, 10) });
+                  }}
+                  maxLength={10}
+                />
+              )}
 
-          {authMode === 'register' && (
-            <input
-              type="tel"
-              placeholder="Mobile Number"
-              required
-              disabled={isAuthLoading}
-              className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-              value={formData.mobile}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
-                setFormData({ ...formData, mobile: value.slice(0, 10) });
-              }}
-              maxLength={10}
-            />
-          )}
-
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            disabled={isAuthLoading}
-            className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          />
-
-          {authMode === 'register' && (
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              required
-              disabled={isAuthLoading}
-              className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            />
-          )}
-
-          <button
-            type="submit"
-            disabled={isAuthLoading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium relative"
-          >
-            {isAuthLoading ? (
-              <div className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  required
+                  disabled={isAuthLoading}
+                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 pr-10"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Processing...
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  )}
+                </button>
               </div>
-            ) : (
-              authMode === 'login' ? 'Login' : 'Create Account'
-            )}
-          </button>
-        </form>
 
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-            className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
-          >
-            {authMode === 'login'
-              ? "Don't have an account? Register here"
-              : "Already have an account? Login here"}
-          </button>
-        </div>
+              {authMode === 'register' && (
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm Password"
+                    required
+                    disabled={isAuthLoading}
+                    className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 pr-10"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isAuthLoading}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium relative"
+              >
+                {isAuthLoading ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Processing...
+                  </div>
+                ) : (
+                  authMode === 'login' ? 'Login' : 'Create Account'
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+              >
+                {authMode === 'login'
+                  ? "Don't have an account? Register here"
+                  : "Already have an account? Login here"}
+              </button>
+            </div>
+
+            {authMode === 'login' && (
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => setIsForgotPassword(true)}
+                  className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
-
 
   // Pagination controls component
   const PaginationControls = () => (
@@ -654,7 +834,7 @@ export default function Home() {
                               <span className="font-semibold dark:text-gray-300">Supplier:</span>
                               <span className="truncate dark:text-gray-200">{result.Suppliername}</span>
 
-                              <span className="font-semibold dark:text-gray-300">Contact:</span>
+                              <span className="font-semibold dark:text-gray-300">Email & Link:</span>
                               <div className="min-w-0">
                                 <a
                                   href={`mailto:${result["Email&link"]}`}
@@ -894,9 +1074,9 @@ export default function Home() {
                 </div>
               </div>
               <div>
-                <h4 className="text-lg font-semibold mb-4">Connect</h4>
+                <h4 className="text-lg font-semibold mb-4">Socials Connect</h4>
                 <div className="flex space-x-4">
-                  {['LinkedIn', 'Twitter', 'YouTube'].map((platform) => (
+                  {['Coming Soon'].map((platform) => (
                     <a key={platform} href="#" className="text-gray-400 hover:text-white transition-colors">
                       {platform}
                     </a>
