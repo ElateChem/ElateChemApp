@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { createClient, User } from '@supabase/supabase-js';
 import SeoProvider from "@/components/seo-provider";
 import { useRef } from 'react';
+import { Resend } from 'resend';
+
+// Initialize Resend client
+const resend = new Resend("re_hMvhwhwJ_2xhfSzgLWtJwFsXLUVoriSgo")
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -204,6 +208,35 @@ export default function Home() {
         }]);
 
       if (error) throw error;
+
+      // Send email notification
+      await resend.emails.send({
+        from: 'ElateChem Request <noreply@elatechem.com>',
+        to: ['elatechem@gmail.com'],
+        subject: `New Chemical Request: ${formRequest.chemicalName}`,
+        html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">New Chemical Request Submitted</h2>
+          <p>A user has requested a chemical that wasn't found in our database:</p>
+          
+          <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
+            <p><strong>Chemical Name:</strong> ${formRequest.chemicalName}</p>
+            ${formRequest.casNumber ? `<p><strong>CAS Number:</strong> ${formRequest.casNumber}</p>` : ''}
+            <p><strong>Contact Info:</strong> ${formRequest.contactInfo}</p>
+            <p><strong>Searched Query:</strong> ${searchQuery}</p>
+            <p><strong>Requested At:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          
+          <p style="margin-top: 24px;">
+            <a href="https://www.elatechem.com/admin/requests" 
+               style="background-color: #2563eb; color: white; padding: 10px 20px; 
+                      text-decoration: none; border-radius: 4px; display: inline-block;">
+              View in Admin Dashboard
+            </a>
+          </p>
+        </div>
+      `
+      });
 
       setRequestSubmitted(true);
       setFormRequest({ chemicalName: '', casNumber: '', contactInfo: '' });
