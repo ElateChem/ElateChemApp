@@ -6,7 +6,6 @@ import { createClient, User } from '@supabase/supabase-js';
 import SeoProvider from "@/components/seo-provider";
 import { useRef } from 'react';
 
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
