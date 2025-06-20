@@ -504,18 +504,42 @@ export default function DashboardClient() {
     const handleDownloadCSV = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('vendors_data') // Changed from vendors_list
-                .select('*')
-                .order('Srno', { ascending: true });
+            const PAGE_SIZE = 1000; // Number of records per page
+            let allVendors: any[] = [];
+            let page = 1;
+            let hasMoreData = true;
 
-            if (error) throw error;
-            if (!data || data.length === 0) {
+            while (hasMoreData) {
+                const { data, error, count } = await supabase
+                    .from('vendors_data')
+                    .select('*', { count: 'exact' })
+                    .order('Srno', { ascending: true })
+                    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    hasMoreData = false;
+                    break;
+                }
+
+                allVendors = [...allVendors, ...data];
+                setMessage(`Fetched ${allVendors.length} of ${count} records...`);
+
+                // Check if we've fetched all records
+                if (data.length < PAGE_SIZE) {
+                    hasMoreData = false;
+                } else {
+                    page++;
+                }
+            }
+
+            if (allVendors.length === 0) {
                 setMessage('No vendors found to download');
                 return;
             }
 
-            const csv = Papa.unparse(data, {
+            // Generate CSV
+            const csv = Papa.unparse(allVendors, {
                 columns: [
                     'Srno',
                     'Chemicalname',
@@ -530,8 +554,19 @@ export default function DashboardClient() {
                 header: true
             });
 
-            // Rest of the download logic remains same
-            // ...
+            // Create and trigger download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `vendors_data_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Clean up
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            setMessage(`Downloaded ${allVendors.length} vendors successfully!`);
         } catch (error: any) {
             console.error('Download error:', error);
             setMessage('Error downloading CSV: ' + error.message);
@@ -724,11 +759,11 @@ export default function DashboardClient() {
                                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                                         />
                                         <button
-                                            // onClick={handleDownloadCSV}
+                                            onClick={handleDownloadCSV}
                                             disabled={isLoadingVendors}
                                             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 whitespace-nowrap"
                                         >
-                                            Download button coming soon
+                                            Download all vendors data in .csv format
                                         </button>
                                     </div>
 

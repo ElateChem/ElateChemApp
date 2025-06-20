@@ -32,6 +32,18 @@ export const seoConfig: Record<string, PageSeo> = {
     keywords: ["contact", "support", "help"],
     icon: "/icons/icon.png",
   },
+  "/privacy&policy": {
+    title: "Privacy & Policy",
+    description: "",
+    keywords: ["contact", "support", "help"],
+    icon: "/icons/icon.png",
+  },
+   "/termsofservice": {
+    title: "Terms of Service",
+    description: "",
+    keywords: ["contact", "support", "help"],
+    icon: "/icons/icon.png",
+  },
   "/login": {
     title: "Secure Login",
     description: "Access your account",

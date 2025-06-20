@@ -176,7 +176,7 @@ export default function About() {
                 </nav>
 
                 <main className="flex-1">
-                    {/* Hero Section */}
+                    {/* Terms of Service Section */}
                     <div className="py-20 bg-gradient-to-b from-blue-50 to-white dark:from-gray-800 dark:to-gray-900">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="max-w-3xl mx-auto text-center mb-20">
@@ -184,16 +184,59 @@ export default function About() {
                                     Terms
                                     <span className="relative mx-2">
                                         <span className="absolute -inset-1 bg-blue-100 dark:bg-blue-900 rounded-lg transform -skew-x-12 opacity-75"></span>
-                                        <span className="relative text-blue-600 dark:text-blue-400">of Services</span>
+                                        <span className="relative text-blue-600 dark:text-blue-400">& Conditions</span>
                                     </span>
                                 </h1>
-                                <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ips
-                                </p>
+                                <div className="text-lg text-gray-600 dark:text-gray-300 space-y-6 text-left">
+                                    <p>
+                                        These Terms of Service ("Terms") govern your access to and use of the Elate Chem website and services. By accessing or using our website, you agree to be bound by these Terms.
+                                    </p>
+
+                                    <p>
+                                        <strong>1. Website Content Usage</strong><br />
+                                        All content provided on the Elate Chem website, including text, images, vendor listings, and any data displayed, is the intellectual property of Elate Chem. The content must not be:
+                                        <br />- Sold or distributed commercially
+                                        <br />- Used for personal, commercial, or resale purposes without written permission
+                                        <br />- Replicated, modified, or hosted on any other platform
+                                    </p>
+
+                                    <p>
+                                        <strong>2. Vendor Data Ownership</strong><br />
+                                        All vendor data collected or displayed through Elate Chem is solely owned by Elate Chem. Users are not permitted to:
+                                        <br />- Download or scrape vendor data
+                                        <br />- Share, leak, or publish any vendor information outside the platform
+                                        <br />- Use vendor data for commercial gain or contact purposes outside Elate Chem’s ecosystem
+                                        <br /><br />
+                                        If any unauthorized access, use, or data leakage is detected, Elate Chem reserves the full right to take strict legal and administrative actions against the offender.
+                                    </p>
+
+                                    <p>
+                                        <strong>3. Limited Access Rights</strong><br />
+                                        Users may only view the data available on the website. No rights are granted to copy, extract, or export any part of the data for offline or personal use.
+                                    </p>
+
+                                    <p>
+                                        <strong>4. Termination of Access</strong><br />
+                                        Elate Chem may terminate or restrict access to any user found violating these Terms without prior notice.
+                                    </p>
+
+                                    <p>
+                                        <strong>5. Changes to Terms</strong><br />
+                                        Elate Chem may update or modify these Terms at any time. Continued use of the website after changes implies agreement to the updated Terms.
+                                    </p>
+
+                                    <p>
+                                        <strong>6. Contact</strong><br />
+                                        For any questions or clarifications regarding these Terms, contact us at:<br />
+                                        <strong>Email:</strong> elatechem@gmail.com<br />
+                                        <strong>Website:</strong> www.elatechem.com
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </main>
+
 
                 {/* Enhanced Footer */}
                 <footer className="bg-gray-900 text-white pt-12">
@@ -202,7 +245,7 @@ export default function About() {
                             <div>
                                 <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
                                 <p className="text-gray-400 text-sm leading-relaxed">
-                                    Pioneering chemical solutions for a sustainable future
+                                    Effective & user-friendly chemical sourcing platform for buyers.
                                 </p>
                             </div>
                             <div>

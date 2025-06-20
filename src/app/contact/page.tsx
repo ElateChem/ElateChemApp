@@ -385,7 +385,7 @@ export default function Contact() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Pioneering chemical solutions for a sustainable future
+                   Effective & user-friendly chemical sourcing platform for buyers.
                 </p>
               </div>
               <div>

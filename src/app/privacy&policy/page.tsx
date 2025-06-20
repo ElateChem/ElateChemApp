@@ -188,13 +188,55 @@ export default function About() {
                                         <span className="relative text-blue-600 dark:text-blue-400">& Policy</span>
                                     </span>
                                 </h1>
-                                <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ips
-                                </p>
+                                <div className="text-lg text-gray-600 dark:text-gray-300 space-y-6 text-left">
+                                    <p>
+                                        At <strong>Elate Chem</strong>, your privacy is important to us. This Privacy Policy outlines how we collect, use, and protect the personal information you provide on our website.
+                                    </p>
+
+                                    <p>
+                                        <strong>1. Information We Collect</strong><br />
+                                        We may collect the following personal information from you:<br />
+                                        - Name<br />
+                                        - Email address<br />
+                                        - Mobile number
+                                    </p>
+
+                                    <p>
+                                        <strong>2. How We Use Your Information</strong><br />
+                                        We use your personal information solely for our internal purposes, including:<br />
+                                        - To respond to your inquiries<br />
+                                        - To provide you with updates or information related to our products or services<br />
+                                        - To improve our customer service<br />
+                                        We <strong>do not sell, rent, or share</strong> your personal information with any third parties.
+                                    </p>
+
+                                    <p>
+                                        <strong>3. Data Security</strong><br />
+                                        We take appropriate steps to protect your personal information from unauthorized access, alteration, disclosure, or destruction.
+                                    </p>
+
+                                    <p>
+                                        <strong>4. Consent</strong><br />
+                                        By using our website and providing your personal information, you consent to the collection and use of your information as outlined in this Privacy Policy. You acknowledge and agree that Elate Chem may use this data for its internal purposes and that you have no objection to this usage.
+                                    </p>
+
+                                    <p>
+                                        <strong>5. Changes to This Policy</strong><br />
+                                        We reserve the right to update or modify this Privacy Policy at any time. Any changes will be posted on this page with an updated effective date.
+                                    </p>
+
+                                    <p>
+                                        <strong>6. Contact Us</strong><br />
+                                        If you have any questions or concerns about this Privacy Policy, please contact us at:<br />
+                                        <strong>Email:</strong> elatechem@gmail.com<br />
+                                        <strong>Website:</strong> www.elatechem.com
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </main>
+
 
                 {/* Enhanced Footer */}
                 <footer className="bg-gray-900 text-white pt-12">
@@ -203,7 +245,7 @@ export default function About() {
                             <div>
                                 <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
                                 <p className="text-gray-400 text-sm leading-relaxed">
-                                    Pioneering chemical solutions for a sustainable future
+                                   Effective & user-friendly chemical sourcing platform for buyers.
                                 </p>
                             </div>
                             <div>

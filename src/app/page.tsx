@@ -40,12 +40,35 @@ export default function Home() {
   const [showPassword, setShowPassword] = useState(false); //state for visiblity of pass
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); //state for visiblity of confirm pass
 
+  //all states is for forgot password logics and form
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
   const [forgotPasswordError, setForgotPasswordError] = useState('');
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
 
+  // Add cookie consent state
+  const [showCookiePopup, setShowCookiePopup] = useState(false);
+
+  // Check if user has already accepted cookies
+  useEffect(() => {
+    const hasAcceptedCookies = localStorage.getItem('cookiesAccepted');
+    if (!hasAcceptedCookies) {
+      // Show popup after a small delay for better UX
+      const timer = setTimeout(() => {
+        setShowCookiePopup(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Handle cookie acceptance
+  const handleAcceptCookies = () => {
+    localStorage.setItem('cookiesAccepted', 'true');
+    setShowCookiePopup(false);
+  };
+
+  //Forgot password modal form
   const ForgotPasswordForm = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
@@ -134,6 +157,7 @@ export default function Home() {
     );
   };
 
+  //Handle password reset functionlity
   const handlePasswordReset = async () => {
     setForgotPasswordError('');
     setIsForgotPasswordLoading(true);
@@ -544,6 +568,23 @@ export default function Home() {
                       </svg>
                     )}
                   </button>
+
+                </div>
+              )}
+
+              {/* Terms after the confirm password field */}
+              {authMode === 'register' && (
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                  <p>
+                    After creating account you accept our{' '}
+                    <Link href="/privacy&policy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      Privacy & Policy
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="/termsofservice" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      Terms of Service
+                    </Link>
+                  </p>
                 </div>
               )}
 
@@ -603,6 +644,8 @@ export default function Home() {
                 </button>
               </div>
             )}
+
+
           </>
         )}
       </div>
@@ -755,6 +798,36 @@ export default function Home() {
 
         {authModal}
 
+        {/* Cookie Consent Popup */}
+        {showCookiePopup && (
+          <div className="fixed inset-x-0 bottom-0 z-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+              <div className="bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col md:flex-row items-center justify-between">
+                <div className="flex-1 mb-4 md:mb-0">
+                  <p className="text-white text-sm md:text-base">
+                    We use cookies to optimize user experience and content.
+                    By continuing to use this site, you agree to our use of cookies.
+                  </p>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setShowCookiePopup(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  >
+                    Decline
+                  </button>
+                  <button
+                    onClick={handleAcceptCookies}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Accept Cookies
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <main className="flex-1">
           {/* Enhanced Hero Section */}
           <div>
@@ -779,14 +852,7 @@ export default function Home() {
                 <div className="max-w-3xl mx-auto text-center mb-20">
                   <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
                     <span className="bg-gradient-to-r text-white dark:text-white bg-clip-text text-transparent">
-                      Welcome to El­­ate
-                    </span>
-                    <span className="relative mx-2">
-                      <span className="absolute -inset-1 bg-blue-100 dark:bg-blue-900 rounded-lg transform -skew-x-12 opacity-75"></span>
-                      <span className="relative text-white dark:text-white"></span>
-                    </span>
-                    <span className="bg-gradient-to-r text-blue-600 dark:text-blue-400">
-                      Chem
+                      Welcome to El­­ate Chem ⚛️
                     </span>
                   </h1>
                   <p className="text-lg text-white dark:text-white mb-8 leading-relaxed">
@@ -896,7 +962,7 @@ export default function Home() {
                         ))}
                       </div>
 
-                      <PaginationControls />
+                      {user && totalPages > 1 && <PaginationControls />}
 
                       {!user && results.length > 1 && (
                         <div className="mt-8 text-center py-8">
