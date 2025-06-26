@@ -180,7 +180,7 @@ export default function Home() {
       }
       // Send password reset email
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
-        redirectTo: `www.elatechem.com/auth/reset-password`,
+        redirectTo: 'www.elatechem.com/auth/reset-password',
       });
       if (resetError) throw resetError;
       setForgotPasswordSuccess(true);
@@ -852,7 +852,7 @@ export default function Home() {
                 <div className="max-w-3xl mx-auto text-center mb-20">
                   <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
                     <span className="bg-gradient-to-r text-white dark:text-white bg-clip-text text-transparent">
-                      Welcome to El­­ate Chem ⚛️
+                      Welcome to El­­ate Chem
                     </span>
                   </h1>
                   <p className="text-lg text-white dark:text-white mb-8 leading-relaxed">
