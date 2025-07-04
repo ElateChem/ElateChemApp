@@ -50,6 +50,22 @@ export default function Home() {
   // Add cookie consent state
   const [showCookiePopup, setShowCookiePopup] = useState(false);
 
+  // New state for Applications dropdown
+  const [showApplicationsDropdown, setShowApplicationsDropdown] = useState(false);
+  const [showMobileApplications, setShowMobileApplications] = useState(false);
+
+  // Chemical list for dropdown
+  const chemicals = [
+    "Sulphuric Acid", "Nitric Acid", "Caustic Soda", "Hydrogen Peroxide",
+    "Chlorine", "Bromine", "Hydrobromic Acid", "Ethanol", "Acetone",
+    "Ammonia", "Hydrochloric Acid", "Formaldehyde", "Acetic Acid",
+    "Sodium Hypochlorite", "Phosphoric Acid", "Methanol", "Toluene",
+    "Xylene", "Ethylene Glycol", "Propylene Glycol", "Butanol",
+    "Isopropyl Alcohol", "Methyl Ethyl Ketone", "Sodium Carbonate",
+    "Potassium Hydroxide", "Calcium Chloride", "Aluminum Chloride",
+    "Sodium Sulfate", "Potassium Permanganate", "Hydrogen Fluoride"
+  ];
+
   // Check if user has already accepted cookies
   useEffect(() => {
     const hasAcceptedCookies = localStorage.getItem('cookiesAccepted');
@@ -175,17 +191,24 @@ export default function Home() {
         .eq('email', forgotPasswordEmail)
         .single();
 
-      if (error || !data) {
-        throw new Error('Email not found. Please check your email or register for a new account.');
+      // Fixed URL with https
+      const redirectUrl = "https://www.elatechem.com/auth/reset-password";
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        forgotPasswordEmail,
+        { redirectTo: redirectUrl }
+      );
+
+      if (resetError) {
+        console.error("Password reset error:", resetError);
+        throw resetError;
       }
-      // Send password reset email
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
-        redirectTo: 'www.elatechem.com/auth/reset-password',
-      });
-      if (resetError) throw resetError;
+
       setForgotPasswordSuccess(true);
     } catch (err) {
-      setForgotPasswordError(err instanceof Error ? err.message : 'Failed to send reset link');
+      setForgotPasswordError(
+        err instanceof Error ? err.message : "Failed to send reset link"
+      );
     } finally {
       setIsForgotPasswordLoading(false);
     }
@@ -714,6 +737,46 @@ export default function Home() {
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
                     </Link>
                   ))}
+
+                  {/* NEW: Applications Dropdown */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => setShowApplicationsDropdown(true)}
+                    onMouseLeave={() => setShowApplicationsDropdown(false)}
+                  >
+                    <button
+                      onClick={() => setShowApplicationsDropdown(!showApplicationsDropdown)}
+                      className="relative px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors group flex items-center"
+                    >
+                      Applications
+                      <svg
+                        className={`w-4 h-4 ml-1 transition-transform ${showApplicationsDropdown ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+                    </button>
+
+                    {showApplicationsDropdown && (
+                      <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 border border-gray-200 dark:border-gray-700">
+                        <div className="max-h-80 overflow-y-auto custom-scrollbar py-2">
+                          {chemicals.map((chemical, index) => (
+                            <Link
+                              key={index}
+                              href={`/applications/${chemical.toLowerCase().replace(/\s+/g, '-')}`}
+                              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                              onClick={() => setShowApplicationsDropdown(false)}
+                            >
+                              {chemical}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Profile Section */}
@@ -791,6 +854,41 @@ export default function Home() {
                     {title}
                   </Link>
                 ))}
+                {/* NEW: Mobile Applications Dropdown */}
+                <div>
+                  <button
+                    onClick={() => setShowMobileApplications(!showMobileApplications)}
+                    className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex justify-between items-center"
+                  >
+                    <span>Applications</span>
+                    <svg
+                      className={`w-5 h-5 transition-transform ${showMobileApplications ? 'rotate-180' : ''}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showMobileApplications && (
+                    <div className="pl-6 max-h-60 overflow-y-auto custom-scrollbar">
+                      {chemicals.map((chemical, index) => (
+                        <Link
+                          key={index}
+                          href={`/applications/${chemical.toLowerCase().replace(/\s+/g, '-')}`}
+                          className="block px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setShowMobileApplications(false);
+                          }}
+                        >
+                          {chemical}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
