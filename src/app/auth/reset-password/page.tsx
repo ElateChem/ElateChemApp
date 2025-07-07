@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
@@ -8,8 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Wrapper component to handle suspense
-function ResetPasswordContent() {
+export default function ResetPassword() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,46 +16,25 @@ function ResetPasswordContent() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [tokenValid, setTokenValid] = useState(false);
-  const [tokenChecked, setTokenChecked] = useState(false);
 
   useEffect(() => {
-    // Get email from URL query parameters
-    const queryParams = new URLSearchParams(window.location.search);
-    const emailParam = queryParams.get('email');
-    if (emailParam) setEmail(decodeURIComponent(emailParam));
-
-    // Verify password reset token
-    const verifyToken = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error || !data.session?.access_token) {
-          setError('Invalid or expired token');
-          setTokenValid(false);
-          return;
-        }
-        
-        // If email param doesn't match token's email
-        if (emailParam && emailParam !== data.session.user?.email) {
-          setError('Email does not match reset token');
-          setTokenValid(false);
-        } else {
-          setTokenValid(true);
-        }
-      } catch (err) {
-        setError('Error verifying token');
-        setTokenValid(false);
-      } finally {
-        setTokenChecked(true);
-      }
-    };
-
-    verifyToken();
+    // Parse email from URL query parameters on client side
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const emailParam = urlParams.get('email');
+    
+    if (emailParam) {
+      setEmail(decodeURIComponent(emailParam));
+    }
   }, []);
 
   const handleResetPassword = async () => {
     setError('');
+    
+    if (!email) {
+      setError('Email is required for password reset');
+      return;
+    }
     
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -71,9 +49,12 @@ function ResetPasswordContent() {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      // Update password directly
+      const { error: updateError } = await supabase.auth.updateUser({
+        password,
+      });
       
-      if (error) throw error;
+      if (updateError) throw updateError;
       
       setSuccess(true);
       setTimeout(() => router.push('/'), 3000);
@@ -83,36 +64,6 @@ function ResetPasswordContent() {
       setLoading(false);
     }
   };
-
-  if (!tokenChecked) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Verifying reset token...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!tokenValid) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md w-full max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-4 text-red-600">Invalid Token</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Your password reset link is invalid or has expired.
-          </p>
-          <button
-            onClick={() => router.push('/forgot-password')}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Request New Reset Link
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -133,19 +84,18 @@ function ResetPasswordContent() {
           </div>
         ) : (
           <>
-            {email && (
-              <div className="mb-4">
-                <label className="block text-gray-700 dark:text-gray-300 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  disabled
-                  className="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-            )}
+            <div className="mb-4">
+              <label className="block text-gray-700 dark:text-gray-300 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                placeholder="Enter your email"
+              />
+            </div>
             
             <div className="mb-4">
               <label className="block text-gray-700 dark:text-gray-300 mb-1">
@@ -184,21 +134,5 @@ function ResetPasswordContent() {
         )}
       </div>
     </div>
-  );
-}
-
-// Main page component with Suspense boundary
-export default function ResetPassword() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading reset page...</p>
-        </div>
-      </div>
-    }>
-      <ResetPasswordContent />
-    </Suspense>
   );
 }
