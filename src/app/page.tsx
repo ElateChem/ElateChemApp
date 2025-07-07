@@ -196,7 +196,7 @@ export default function Home() {
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         forgotPasswordEmail,
-        { redirectTo: redirectUrl }
+        { redirectTo: `https://www.elatechem.com/auth/reset-password?email=${encodeURIComponent(forgotPasswordEmail)}` }
       );
 
       if (resetError) {
