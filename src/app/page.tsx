@@ -192,11 +192,11 @@ export default function Home() {
         .single();
 
       // Fixed URL with https
-      const redirectUrl = "https://www.elatechem.com/auth/reset-password";
+      const redirectUrl = `https://www.elatechem.com/auth/reset-password?email=${encodeURIComponent(forgotPasswordEmail)}`;
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         forgotPasswordEmail,
-        { redirectTo: `https://www.elatechem.com/auth/reset-password?email=${encodeURIComponent(forgotPasswordEmail)}` }
+        { redirectTo: redirectUrl }
       );
 
       if (resetError) {
