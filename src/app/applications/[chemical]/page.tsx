@@ -1,6 +1,6 @@
-// app/applications/[chemical]/page.tsx
 import { notFound } from 'next/navigation';
 import AppNavigation from '../../../components/AppNavigation'; // Import the navigation component
+import type { Metadata } from 'next';
 
 // Define chemical data directly in the file
 const chemicalData: Record<string, {
@@ -687,8 +687,9 @@ const chemicalData: Record<string, {
   }
 };
 
-export default function ChemicalPage({ params }: { params: { chemical: string } }) {
-  const chemical = chemicalData[params.chemical];
+
+export default function ChemicalPage(props: any) {
+  const chemical = chemicalData[props.params.chemical];
 
   if (!chemical) {
     return notFound();
@@ -696,7 +697,7 @@ export default function ChemicalPage({ params }: { params: { chemical: string } 
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      
+
       <AppNavigation />
 
       {/* Hero Section */}
@@ -785,26 +786,6 @@ export default function ChemicalPage({ params }: { params: { chemical: string } 
               </dl>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Related Chemicals
-              </h3>
-              <ul className="mt-4 space-y-2">
-                {Object.entries(chemicalData)
-                  .filter(([key]) => key !== params.chemical)
-                  .slice(0, 5)
-                  .map(([key, chem]) => (
-                    <li key={key}>
-                      <a
-                        href={`/applications/${key}`}
-                        className="text-blue-600 dark:text-blue-400 hover:underline block py-2"
-                      >
-                        {chem.name}
-                      </a>
-                    </li>
-                  ))}
-              </ul>
-            </div>
           </div>
         </div>
 
@@ -847,7 +828,7 @@ export async function generateStaticParams() {
 }
 
 // Set dynamic metadata
-export async function generateMetadata({ params }: { params: { chemical: string } }) {
+export async function generateMetadata({ params }: any): Promise<Metadata> {
   const chemical = chemicalData[params.chemical];
 
   if (!chemical) {
