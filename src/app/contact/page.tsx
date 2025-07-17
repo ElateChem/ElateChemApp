@@ -12,15 +12,33 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function Contact() {
+// Chemical list for dropdown - ADDED
+const chemicals = [
+  "Sulphuric Acid", "Nitric Acid", "Caustic Soda", "Hydrogen Peroxide",
+  "Chlorine", "Bromine", "Hydrobromic Acid", "Ethanol", "Acetone",
+  "Acetic Acid", "Acrylic Acid", "Adipic Acid", "Butyl Acetate",
+  "Butyraldehyde", "Cyclohexane", "Cyclohexanone", "Dimethylformamide",
+  "Benzene", "Toluene", "Xylene", "Sodium Methoxide",
+  "Sodium t-Butoxide", "Meta Chloro Aniline", "Para Toluene Sulfonic Acid",
+  "Para Toluene Sulfonic Chloride", "Thionyl Chloride", "Cyanuric Chloride",
+  "Sodium Gluconate", "Benzoic Acid", "Phosphoric Acid",
+  "Phosphorus Trichloride", "Phosphorus Oxychloride", "N-Methyl-2-Pyrrolidone",
+  "Tetrahydrofuran", "Morpholine", "Ethylene Oxide", "Propylene Oxide",
+  "Propylene Glycol", "Monoethylene Glycol", "Diethylene Glycol",
+  "Triethylene Glycol", "Acetonitrile"
+];
 
+export default function Contact() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
-
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  // ADDED: Applications dropdown states
+  const [showApplicationsDropdown, setShowApplicationsDropdown] = useState(false);
+  const [showMobileApplications, setShowMobileApplications] = useState(false);
+
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -107,6 +125,46 @@ export default function Contact() {
                   </Link>
                 ))}
 
+                {/* ADDED: Applications Dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setShowApplicationsDropdown(true)}
+                  onMouseLeave={() => setShowApplicationsDropdown(false)}
+                >
+                  <button
+                    onClick={() => setShowApplicationsDropdown(!showApplicationsDropdown)}
+                    className="relative px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors group flex items-center"
+                  >
+                    Applications
+                    <svg
+                      className={`w-4 h-4 ml-1 transition-transform ${showApplicationsDropdown ? 'rotate-180' : ''}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+                  </button>
+
+                  {showApplicationsDropdown && (
+                    <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 border border-gray-200 dark:border-gray-700">
+                      <div className="max-h-80 overflow-y-auto custom-scrollbar py-2">
+                        {chemicals.map((chemical, index) => (
+                          <Link
+                            key={index}
+                            href={`/applications/${chemical.toLowerCase().replace(/\s+/g, '-')}`}
+                            className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            onClick={() => setShowApplicationsDropdown(false)}
+                          >
+                            {chemical}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {user ? (
                   <div className="relative ml-4">
                     <button
@@ -144,9 +202,7 @@ export default function Contact() {
                     )}
                   </div>
                 ) : (
-                  <button className="ml-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-
-                  </button>
+                  <button className="ml-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"></button>
                 )}
               </div>
 
@@ -179,10 +235,47 @@ export default function Contact() {
                     key={title}
                     href={url}
                     className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     {title}
                   </Link>
                 ))}
+
+                {/* ADDED: Mobile Applications Dropdown */}
+                <div>
+                  <button
+                    onClick={() => setShowMobileApplications(!showMobileApplications)}
+                    className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex justify-between items-center"
+                  >
+                    <span>Applications</span>
+                    <svg
+                      className={`w-5 h-5 transition-transform ${showMobileApplications ? 'rotate-180' : ''}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showMobileApplications && (
+                    <div className="pl-6 max-h-60 overflow-y-auto custom-scrollbar">
+                      {chemicals.map((chemical, index) => (
+                        <Link
+                          key={index}
+                          href={`/applications/${chemical.toLowerCase().replace(/\s+/g, '-')}`}
+                          className="block px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setShowMobileApplications(false);
+                          }}
+                        >
+                          {chemical}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {user && (
                   <div className="px-4 py-3">
@@ -385,7 +478,7 @@ export default function Contact() {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                   Effective & user-friendly chemical sourcing platform for buyers.
+                  Effective & user-friendly chemical sourcing platform for buyers.
                 </p>
               </div>
               <div>
@@ -433,6 +526,32 @@ export default function Contact() {
             </div>
           </div>
         </footer>
+
+        {/* Add custom scrollbar styles */}
+        <style jsx global>{`
+          .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #c5c5c5 transparent;
+          }
+          
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+          }
+          
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 10px;
+          }
+          
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #c5c5c5;
+            border-radius: 10px;
+          }
+          
+          .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+          }
+        `}</style>
       </div>
     </SeoProvider>
   );

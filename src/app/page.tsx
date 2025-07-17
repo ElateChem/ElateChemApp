@@ -58,12 +58,16 @@ export default function Home() {
   const chemicals = [
     "Sulphuric Acid", "Nitric Acid", "Caustic Soda", "Hydrogen Peroxide",
     "Chlorine", "Bromine", "Hydrobromic Acid", "Ethanol", "Acetone",
-    "Ammonia", "Hydrochloric Acid", "Formaldehyde", "Acetic Acid",
-    "Sodium Hypochlorite", "Phosphoric Acid", "Methanol", "Toluene",
-    "Xylene", "Ethylene Glycol", "Propylene Glycol", "Butanol",
-    "Isopropyl Alcohol", "Methyl Ethyl Ketone", "Sodium Carbonate",
-    "Potassium Hydroxide", "Calcium Chloride", "Aluminum Chloride",
-    "Sodium Sulfate", "Potassium Permanganate", "Hydrogen Fluoride"
+    "Acetic Acid", "Acrylic Acid", "Adipic Acid", "Butyl Acetate",
+    "Butyraldehyde", "Cyclohexane", "Cyclohexanone", "Dimethylformamide",
+    "Benzene", "Toluene", "Xylene", "Sodium Methoxide",
+    "Sodium t-Butoxide", "Meta Chloro Aniline", "Para Toluene Sulfonic Acid",
+    "Para Toluene Sulfonic Chloride", "Thionyl Chloride", "Cyanuric Chloride",
+    "Sodium Gluconate", "Benzoic Acid", "Phosphoric Acid",
+    "Phosphorus Trichloride", "Phosphorus Oxychloride", "N-Methyl-2-Pyrrolidone",
+    "Tetrahydrofuran", "Morpholine", "Ethylene Oxide", "Propylene Oxide",
+    "Propylene Glycol", "Monoethylene Glycol", "Diethylene Glycol",
+    "Triethylene Glycol", "Acetonitrile"
   ];
 
   // Check if user has already accepted cookies
