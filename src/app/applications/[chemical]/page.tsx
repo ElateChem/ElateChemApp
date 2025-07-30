@@ -750,7 +750,7 @@ export default function ChemicalPage(props: any) {
                 Find Suppliers
               </h3>
               <p className="mt-2 text-gray-600 dark:text-gray-300">
-                Search our verified database of {chemical.suppliers.toLocaleString()}+ suppliers for {chemical.name}
+                Search in our vast supplier database for {chemical.name}. Get complete Access Now
               </p>
               <div className="mt-6">
                 <a
@@ -764,7 +764,7 @@ export default function ChemicalPage(props: any) {
 
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Technical Specifications
+                Technical Information
               </h3>
               <dl className="mt-4 space-y-4">
                 <div className="flex justify-between">
@@ -816,6 +816,63 @@ export default function ChemicalPage(props: any) {
           </div>
         </div>
       </div>
+
+       {/* Enhanced Footer */}
+        <footer className="bg-gray-900 text-white pt-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Effective & user-friendly chemical sourcing platform for buyers.
+                </p>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+                <div className="space-y-2">
+                  {[
+                    ['Home', '/'],
+                    ['About', '/about'],
+                    ['Contact', '/contact'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Legal</h4>
+                <div className="space-y-2">
+                  {[
+                    ['Privacy & Policy', '/privacy&policy'],
+                    ['Terms of Service', '/termsofservice'],
+                  ].map(([title, url]) => (
+                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                      {title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Socials Connect</h4>
+                <div className="flex space-x-4">
+                  {['Coming Soon'].map((platform) => (
+                    <a key={platform} href="#" className="text-gray-400 hover:text-white transition-colors">
+                      {platform}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="border-t border-gray-800 py-8 text-center">
+              <p className="text-gray-400 text-sm">
+                © {new Date().getFullYear()} Elate Chem. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </footer>
+
     </div>
   );
 }
