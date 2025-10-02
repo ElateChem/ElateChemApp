@@ -932,7 +932,9 @@ export default function DashboardClient() {
                                                         <tr key={index}>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">{submission.name}</td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">{submission.email}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm max-w-xs truncate">{submission.message}</td>
+                                                            <td className="px-6 py-4 text-sm max-w-md break-words whitespace-normal">
+                                                                {submission.message}
+                                                            </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">{submission.submitted_at}</td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                                 <button
