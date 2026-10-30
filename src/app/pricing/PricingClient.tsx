@@ -138,6 +138,9 @@ export default function PricingClient() {
                         </h1>
                         <p className="mt-2 text-gray-600 dark:text-gray-300">
                             Date-wise pricing for bulk chemicals, solvents, and intermediates.
+                            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                                (Prices in INR /kg)
+                            </span>
                         </p>
                         {!loading && !error && pivot.materials.length > 0 && (
                             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
@@ -214,8 +217,8 @@ export default function PricingClient() {
                                                 <th
                                                     key={d}
                                                     className={`px-3 py-2 text-right text-xs font-semibold border-b border-gray-300 dark:border-gray-600 whitespace-nowrap ${d === latestDate
-                                                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
-                                                            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
+                                                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+                                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
                                                         }`}
                                                 >
                                                     {formatHeaderDate(d)}
@@ -254,19 +257,22 @@ export default function PricingClient() {
                                                                 title={
                                                                     cell
                                                                         ? `${mat} · ${d} · ${hasPrice
-                                                                            ? priceFormatter.format(Number(cell.price))
+                                                                            ? `${priceFormatter.format(Number(cell.price))} INR /kg`
                                                                             : 'no price'
                                                                         }`
                                                                         : `${mat} · ${d} · —`
                                                                 }
                                                                 className={`px-3 py-1.5 text-right border-b border-gray-100 dark:border-gray-800 whitespace-nowrap ${d === latestDate
-                                                                        ? 'bg-blue-50/40 dark:bg-blue-900/10'
-                                                                        : ''
+                                                                    ? 'bg-blue-50/40 dark:bg-blue-900/10'
+                                                                    : ''
                                                                     }`}
                                                             >
                                                                 {hasPrice ? (
-                                                                    <span className="text-gray-800 dark:text-gray-200 tabular-nums">
+                                                                    <span className="text-gray-800 dark:text-gray-200 tabular-nums whitespace-nowrap">
                                                                         {priceFormatter.format(Number(cell.price))}
+                                                                        <span className="text-[10px] text-gray-500 dark:text-gray-400 ml-1 font-normal">
+                                                                            INR /kg
+                                                                        </span>
                                                                     </span>
                                                                 ) : (
                                                                     <span className="text-gray-300 dark:text-gray-600">
