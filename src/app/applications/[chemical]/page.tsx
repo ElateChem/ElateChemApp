@@ -688,8 +688,13 @@ const chemicalData: Record<string, {
 };
 
 
-export default function ChemicalPage(props: any) {
-  const chemical = chemicalData[props.params.chemical];
+export default async function ChemicalPage({
+  params,
+}: {
+  params: Promise<{ chemical: string }>;
+}) {
+  const { chemical: slug } = await params;
+  const chemical = chemicalData[slug];
 
   if (!chemical) {
     return notFound();
@@ -817,62 +822,62 @@ export default function ChemicalPage(props: any) {
         </div>
       </div>
 
-       {/* Enhanced Footer */}
-        <footer className="bg-gray-900 text-white pt-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Effective & user-friendly chemical sourcing platform for buyers.
-                </p>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-                <div className="space-y-2">
-                  {[
-                    ['Home', '/'],
+      {/* Enhanced Footer */}
+      <footer className="bg-gray-900 text-white pt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Elate Chem</h4>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Effective & user-friendly chemical sourcing platform for buyers.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <div className="space-y-2">
+                {[
+                  ['Home', '/'],
                   ['About', '/about'],
                   ['Pricing', '/pricing'],
                   ['Contact', '/contact'],
-                  ].map(([title, url]) => (
-                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
-                      {title}
-                    </a>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Legal</h4>
-                <div className="space-y-2">
-                  {[
-                    ['Privacy & Policy', '/privacy&policy'],
-                    ['Terms of Service', '/termsofservice'],
-                  ].map(([title, url]) => (
-                    <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
-                      {title}
-                    </a>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Socials Connect</h4>
-                <div className="flex space-x-4">
-                  {['Coming Soon'].map((platform) => (
-                    <a key={platform} href="#" className="text-gray-400 hover:text-white transition-colors">
-                      {platform}
-                    </a>
-                  ))}
-                </div>
+                ].map(([title, url]) => (
+                  <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                    {title}
+                  </a>
+                ))}
               </div>
             </div>
-            <div className="border-t border-gray-800 py-8 text-center">
-              <p className="text-gray-400 text-sm">
-                © {new Date().getFullYear()} Elate Chem. All rights reserved.
-              </p>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Legal</h4>
+              <div className="space-y-2">
+                {[
+                  ['Privacy & Policy', '/privacy&policy'],
+                  ['Terms of Service', '/termsofservice'],
+                ].map(([title, url]) => (
+                  <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
+                    {title}
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Socials Connect</h4>
+              <div className="flex space-x-4">
+                {['Coming Soon'].map((platform) => (
+                  <a key={platform} href="#" className="text-gray-400 hover:text-white transition-colors">
+                    {platform}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
-        </footer>
+          <div className="border-t border-gray-800 py-8 text-center">
+            <p className="text-gray-400 text-sm">
+              © {new Date().getFullYear()} Elate Chem. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
@@ -886,8 +891,13 @@ export async function generateStaticParams() {
 }
 
 // Set dynamic metadata
-export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const chemical = chemicalData[params.chemical];
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ chemical: string }>;
+}): Promise<Metadata> {
+  const { chemical: slug } = await params;
+  const chemical = chemicalData[slug];
 
   if (!chemical) {
     return {
@@ -904,7 +914,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       description: `Learn about industrial applications and uses of ${chemical.name} in various sectors.`,
       images: [
         {
-          url: `/chemicals/${params.chemical}.jpg`,
+          url: `/chemicals/${slug}.jpg`,
           width: 800,
           height: 600,
           alt: chemical.name,
