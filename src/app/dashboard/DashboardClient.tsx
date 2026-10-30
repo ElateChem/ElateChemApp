@@ -14,6 +14,8 @@ import {
 } from '@heroicons/react/24/outline'
 import SeoProvider from "@/components/seo-provider";
 import Papa from 'papaparse';
+import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { parsePricingFile, type ParseResult } from '@/lib/pricingParser';
 
 
 const supabase = createClient(
@@ -60,6 +62,15 @@ export default function DashboardClient() {
     const [totalVendors, setTotalVendors] = useState(0);
     const [totalContacts, setTotalContacts] = useState(0);
     const [totalRequests, setTotalRequests] = useState(0);
+
+    // --- Pricing state ---
+    const [pricingPreview, setPricingPreview] = useState<ParseResult | null>(null);
+    const [pricingWarnings, setPricingWarnings] = useState<string[]>([]);
+    const [pricingParseError, setPricingParseError] = useState('');
+    const [isSavingPricing, setIsSavingPricing] = useState(false);
+    const [pricingStats, setPricingStats] = useState<{
+        rows: number; materials: number; latestDate: string | null;
+    }>({ rows: 0, materials: 0, latestDate: null });
 
     // Add clear handler
     const handleClearHistory = () => {
@@ -145,6 +156,72 @@ export default function DashboardClient() {
         }
     };
 
+    const handlePricingFilePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setPricingParseError('');
+        setPricingWarnings([]);
+        setPricingPreview(null);
+        try {
+            const result = await parsePricingFile(file);
+            if (!result.rows.length) throw new Error('No valid pricing rows parsed');
+            setPricingPreview(result);
+            setPricingWarnings(result.warnings);
+        } catch (err: any) {
+            setPricingParseError(err.message);
+        } finally {
+            // Allow re-selecting the same file
+            e.target.value = '';
+        }
+    };
+
+    const handleConfirmPricingUpload = async () => {
+        if (!pricingPreview) return;
+        if (!window.confirm(
+            `This will DELETE all ${pricingStats.rows} existing price points and replace them with ${pricingPreview.rows.length} new rows. Continue?`
+        )) return;
+
+        setIsSavingPricing(true);
+        try {
+            const { data, error } = await supabase.rpc('replace_pricing_data', {
+                new_rows: pricingPreview.rows,
+            });
+            if (error) throw error;
+
+            setPricingPreview(null);
+            setPricingWarnings([]);
+
+            // Refresh stats
+            const { data: stats } = await supabase.rpc('pricing_stats');
+            if (stats?.[0]) {
+                setPricingStats({
+                    rows: Number(stats[0].row_count),
+                    materials: Number(stats[0].material_count),
+                    latestDate: stats[0].latest_date,
+                });
+            }
+            setMessage(`Pricing replaced: ${data ?? pricingPreview.rows.length} rows saved.`);
+        } catch (err: any) {
+            setMessage('Replace failed: ' + err.message);
+        } finally {
+            setIsSavingPricing(false);
+        }
+    };
+
+    // Use effect for pricing metrics
+    useEffect(() => {
+        if (activeTab !== 'pricing-data') return;
+        (async () => {
+            const { data, error } = await supabase.rpc('pricing_stats');
+            if (!error && data?.[0]) {
+                setPricingStats({
+                    rows: Number(data[0].row_count),
+                    materials: Number(data[0].material_count),
+                    latestDate: data[0].latest_date,
+                });
+            }
+        })();
+    }, [activeTab]);
 
     // Add useEffect for fetching dashboard data
     useEffect(() => {
@@ -253,6 +330,12 @@ export default function DashboardClient() {
             id: 'contact-submissions',
             icon: ContactIcon,
             current: activeTab === 'contact-submissions'
+        },
+        {
+            name: 'Pricing Data',
+            id: 'pricing-data',
+            icon: CurrencyDollarIcon,
+            current: activeTab === 'pricing-data',
         },
         {
             name: 'Requests',
@@ -1045,6 +1128,124 @@ export default function DashboardClient() {
                                                     </button>
                                                 </div>
                                             ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            <section
+                                id="pricing-data"
+                                className={`${activeTab === 'pricing-data' ? 'block' : 'hidden'}`}
+                            >
+                                <div className="bg-white p-6 rounded-lg shadow-md">
+                                    <h2 className="text-2xl font-semibold mb-6">Pricing Data</h2>
+
+                                    {/* Stats tiles */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                        <div className="bg-gray-50 p-4 rounded-lg">
+                                            <div className="text-sm text-gray-500">Materials</div>
+                                            <div className="text-2xl font-bold">{pricingStats.materials}</div>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-lg">
+                                            <div className="text-sm text-gray-500">Price Points</div>
+                                            <div className="text-2xl font-bold">{pricingStats.rows}</div>
+                                        </div>
+                                        <div className="bg-gray-50 p-4 rounded-lg">
+                                            <div className="text-sm text-gray-500">Latest Date</div>
+                                            <div className="text-2xl font-bold">{pricingStats.latestDate ?? '—'}</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Upload input */}
+                                    <div className="mb-6">
+                                        <label className="block text-gray-700 mb-2 font-medium">
+                                            Upload new pricing file (.xlsx / .xls / .csv)
+                                        </label>
+                                        <input
+                                            type="file"
+                                            accept=".xlsx,.xls,.csv"
+                                            onChange={handlePricingFilePick}
+                                            disabled={isSavingPricing}
+                                            className="w-full px-3 py-2 border rounded-lg"
+                                        />
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            First column must be <code>Material name</code>, followed by date columns
+                                            (DD.MM.YY), last column <code>Port</code>. Existing data will be replaced.
+                                        </p>
+                                    </div>
+
+                                    {pricingParseError && (
+                                        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{pricingParseError}</div>
+                                    )}
+
+                                    {pricingWarnings.length > 0 && (
+                                        <div className="mb-4 p-3 bg-yellow-50 text-yellow-800 rounded">
+                                            <div className="font-medium mb-1">Parsed with {pricingWarnings.length} warning(s):</div>
+                                            <ul className="list-disc pl-5 text-sm space-y-0.5 max-h-40 overflow-y-auto">
+                                                {pricingWarnings.map((w, i) => <li key={i}>{w}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Preview */}
+                                    {pricingPreview && (
+                                        <div className="mb-4">
+                                            <div className="text-sm text-gray-700 mb-2">
+                                                <b>Preview:</b> {pricingPreview.rows.length} price points ·{' '}
+                                                {pricingPreview.materials.length} materials ·{' '}
+                                                {pricingPreview.dates.length} dates
+                                            </div>
+
+                                            <div className="overflow-auto max-h-72 border rounded-lg">
+                                                <table className="min-w-full text-sm">
+                                                    <thead className="bg-gray-100 sticky top-0">
+                                                        <tr>
+                                                            <th className="px-3 py-2 text-left">Material</th>
+                                                            <th className="px-3 py-2 text-left">Date</th>
+                                                            <th className="px-3 py-2 text-right">Price</th>
+                                                            <th className="px-3 py-2 text-left">Port</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {pricingPreview.rows.slice(0, 100).map((r, i) => (
+                                                            <tr key={i} className="border-t">
+                                                                <td className="px-3 py-1">{r.material_name}</td>
+                                                                <td className="px-3 py-1">{r.price_date}</td>
+                                                                <td className="px-3 py-1 text-right">{r.price}</td>
+                                                                <td className="px-3 py-1">{r.port ?? ''}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            {pricingPreview.rows.length > 100 && (
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    Showing first 100 of {pricingPreview.rows.length} rows.
+                                                </div>
+                                            )}
+
+                                            <div className="mt-4 flex flex-wrap items-center gap-3">
+                                                <button
+                                                    onClick={handleConfirmPricingUpload}
+                                                    disabled={isSavingPricing}
+                                                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                                                >
+                                                    {isSavingPricing
+                                                        ? 'Replacing…'
+                                                        : `Replace All Pricing (${pricingPreview.rows.length} rows)`}
+                                                </button>
+                                                <button
+                                                    onClick={() => { setPricingPreview(null); setPricingWarnings([]); }}
+                                                    disabled={isSavingPricing}
+                                                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+
+                                            <p className="text-xs text-red-600 mt-2">
+                                                ⚠️ This deletes all existing pricing data and replaces it with the file above.
+                                            </p>
                                         </div>
                                     )}
                                 </div>

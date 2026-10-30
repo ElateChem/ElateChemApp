@@ -67,8 +67,9 @@ export default function AppNavigation() {
           <div className="hidden md:flex items-center space-x-8">
             {[
               ['Home', '/'],
-              ['About', '/about'],
-              ['Contact', '/contact'],
+                  ['About', '/about'],
+                  ['Pricing', '/pricing'],
+                  ['Contact', '/contact'],
             ].map(([title, url]) => (
               <Link
                 key={title}
@@ -183,8 +184,9 @@ export default function AppNavigation() {
           <div className="md:hidden pb-4 space-y-2 animate-fade-in">
             {[
               ['Home', '/'],
-              ['About', '/about'],
-              ['Contact', '/contact'],
+                  ['About', '/about'],
+                  ['Pricing', '/pricing'],
+                  ['Contact', '/contact'],
             ].map(([title, url]) => (
               <Link
                 key={title}

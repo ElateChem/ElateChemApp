@@ -5,6 +5,7 @@ export const siteConfig = {
   mainNav: [
     { title: "Home", href: "/" },
     { title: "About", href: "/about" },
+    { title: "Pricing", href: "/pricing" },
     { title: "Contact", href: "/contact" },
   ],
   links: {
@@ -24,6 +25,12 @@ export const seoConfig: Record<string, PageSeo> = {
     title: "About Us",
     description: "Being Procurement Professional, we are aware how important is sourcing to get right product from right source. We are providing data of all relevant suppliers from India, China, Japan, Korea, Taiwan, US and other countries which help you to add more value at your work. we are providing vendor data base for all key materials lie Petrochemicals, Bulk materials, Agrochemicals, Specialty chemicals.",
     keywords: ["about", "history", "team"],
+    icon: "/icons/icon.png",
+  },
+  "/pricing": {
+    title: "Pricing",
+    description: "Explore our pricing plans and transparent chemical sourcing rates.",
+    keywords: ["pricing", "plans", "cost"],
     icon: "/icons/icon.png",
   },
   "/contact": {

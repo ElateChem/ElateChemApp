@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// @ts-ignore Next.js processes this global CSS import at build time.
 import "./globals.css";
 import { siteConfig } from "@/config/seo";
 import { GoogleAnalytics } from '@next/third-parties/google';

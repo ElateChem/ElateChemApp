@@ -832,8 +832,9 @@ export default function ChemicalPage(props: any) {
                 <div className="space-y-2">
                   {[
                     ['Home', '/'],
-                    ['About', '/about'],
-                    ['Contact', '/contact'],
+                  ['About', '/about'],
+                  ['Pricing', '/pricing'],
+                  ['Contact', '/contact'],
                   ].map(([title, url]) => (
                     <a key={title} href={url} className="block text-gray-400 hover:text-white transition-colors">
                       {title}
